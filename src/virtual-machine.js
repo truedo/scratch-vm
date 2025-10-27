@@ -1,3 +1,4 @@
+console.log("🚀 Using local Scratch-VM!");
 let _TextEncoder;
 if (typeof TextEncoder === 'undefined') {
     _TextEncoder = require('text-encoding').TextEncoder;
