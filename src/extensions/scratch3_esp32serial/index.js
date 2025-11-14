@@ -127,13 +127,13 @@ const CommandType_DATA_LENGTH = {
 
     COMMAND_GO_UNTIL_DIST: 26,
     COMMAND_FREE_TURN: 27,
-    COMMAND_LINE_TRACE_DIST: 28,
+    COMMAND_LINE_TRACE_DIST: 2,
     COMMAND_GO_INFINITE: 3,
     COMMAND_TRACE_INFINITE: 30,
 
     COMMAND_LED_CONTROL: 31,
-    COMMAND_MOTOR1_INFINITE: 32,
-    COMMAND_MOTOR2_INFINITE: 33,
+    COMMAND_MOTOR1_INFINITE: 3,
+    COMMAND_MOTOR2_INFINITE: 3,
     COMMAND_LED_INFINITE: 34,
 
     COMMAND_CONTROL_MODE1: 35,
@@ -151,7 +151,7 @@ const CommandType_DATA_LENGTH = {
     COMMAND_FREE_TURN_PYTHON: 4,
 
     COMMAND_GOSENSOR: 3,
-    COMMAND_LINE_TRACING: 101,
+    COMMAND_LINE_TRACING: 5,
     COMMAND_COLOR_TRACKING: 102,
 
     COMMAND_ROBOT_LINE: 103,
@@ -241,7 +241,22 @@ class Scratch3Esp32Serial {
        // this.writer = null;
         this.receivedData = '';
 
+        // this.runtime = runtime;
+        this.port = null;
+        //  this.serialPort = null; // 포트 객체 (connectPort에서 사용하신 변수명)
+        //this._current_request = 0x00;
 
+        this.sendQueue = []; // 전송할 데이터가 담길 큐 (Array)
+        this.isSending = false; // 현재 전송 중인지 확인하는 플래그
+        this.isLoopRunning = false; // 주기적 전송 루프 상태
+        this.sendLoopTimeout = null; // setTimeout 핸들을 저장할 변수
+        //// 전송할 단일 명령(Uint8Array)을 저장할 변수
+        this.nextCommandPayload = null;
+
+
+        this.tSpd1 = 0;
+        this.tSpd2 = 0;
+        this.tDir = 0b01000000;
 
 
         // Web Serial API 지원 여부 확인
@@ -318,12 +333,14 @@ class Scratch3Esp32Serial {
 
         this.connectPort();
 
+
     }
 
-        _setLocale () {
+
+    _setLocale () {
         let nowLocale = '';
         //nowLocale = formatMessage.setup().locale;
-       // console.log(nowLocale)
+        // console.log(nowLocale)
         switch (formatMessage.setup().locale) {
         case 'ko':
             nowLocale = 'ko';
@@ -343,8 +360,7 @@ class Scratch3Esp32Serial {
      */
     getInfo () {
 
-        // 기존의 'const locale = this.runtime.getLocale();' 이 줄을 제거해야 합니다.
-
+       // 기존의 'const locale = this.runtime.getLocale();' 이 줄을 제거해야 합니다.
        // the_locale = this._setLocale();
         //this.connectPort();
         //console.log("_setLocale");
@@ -368,8 +384,6 @@ class Scratch3Esp32Serial {
             color1: '#204ECF', // 블록 기본 색
             color2: '#193EAA', // 블록 테두리/음영
             color3: '#132F85', // 입력 영역 강조
-
-
 
 
             name: '주미 AI', // 확장자 메뉴 이름 (필요시 translation.js에서 가져오는 것으로 변경 가능)
@@ -459,7 +473,7 @@ class Scratch3Esp32Serial {
                     }
                 },
 
-                // 색상 값을 변수로 받음
+                // 패턴 변경
                 {
                     opcode: 'ledPattern',
                     blockType: BlockType.COMMAND,
@@ -561,7 +575,6 @@ class Scratch3Esp32Serial {
                     }
                 },
 
-
                 // 글자 색상 및 크기 설정
                 {
                     opcode: 'display_text_set_command',
@@ -625,16 +638,15 @@ class Scratch3Esp32Serial {
                 '---',
                 // 지정된 거리 만큼 이동
                 {
-                    opcode: 'forward_dist',
+                    opcode: 'move_dist',
                     blockType: BlockType.COMMAND,
-                    text: '[MOVE_DIRECTION] 방향으로 [MOVE_SPEED] 속도로 거리만큼 [MOVE_DIST] 이동',
+                    text: '[MOVE_DIRECTION] 방향으로 [MOVE_SPEED] 속도로 거리만큼 [MOVE_DIST] cm 이동',
                     arguments: {
                         MOVE_DIRECTION: {
                             type: ArgumentType.STRING,
                             menu: 'moveDirection', // 위에서 정의한 드롭다운 메뉴 사용
                             defaultValue: '0'
                         },
-
                         MOVE_SPEED: {
                             type: ArgumentType.STRING,
                             menu: 'moveSpeed', // 위에서 정의한 드롭다운 메뉴 사용
@@ -647,6 +659,26 @@ class Scratch3Esp32Serial {
                         },
                     }
                 },
+
+                // 빠르게 지정된 거리 만큼 이동
+                {
+                    opcode: 'move_dist_quick',
+                    blockType: BlockType.COMMAND,
+                    text: '빠르게 [MOVE_DIRECTION] 방향으로 거리만큼 [MOVE_DIST] cm 이동',
+                    arguments: {
+                        MOVE_DIRECTION: {
+                            type: ArgumentType.STRING,
+                            menu: 'moveDirection', // 위에서 정의한 드롭다운 메뉴 사용
+                            defaultValue: '0'
+                        },
+                        MOVE_DIST: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 10,
+                            acceptReporters: true,
+                        },
+                    }
+                },
+
                 // 지정된 각도만큼 회전
                 {
                     opcode: 'turn_angle',
@@ -668,11 +700,320 @@ class Scratch3Esp32Serial {
                             menu: 'moveSpeed', // 위에서 정의한 드롭다운 메뉴 사용
                             defaultValue: '2'
                         },
+                    }
+                },
+
+                // 빠르게 지정된 각도만큼 회전
+                {
+                    opcode: 'turn_angle_quick',
+                    blockType: BlockType.COMMAND,
+                    text: '빠르게 [TURN_DIRECTION] 방향으로 [TURN_ANGLE] 도 회전',
+                    arguments: {
+                        TURN_DIRECTION: {
+                            type: ArgumentType.STRING,
+                            menu: 'turnDirection', // 위에서 정의한 드롭다운 메뉴 사용
+                            defaultValue: '0'
+                        },
+                        TURN_ANGLE: {
+                            type: ArgumentType.ANGLE,
+                            defaultValue: 90,
+                            acceptReporters: true,
+                        },
+                    }
+                },
+
+                //  전방 센서에 무언가가 감지될 때까지 주미가 직진
+                {
+                    opcode: 'go_sensor',
+                    blockType: BlockType.COMMAND,
+                    text: '[MOVE_SPEED] 속도로 직진, 좌 센서 [LEFT_SENSOR] / 우 센서 [RIGHT_SENSOR] 이하 감지 시 멈춤',
+                    arguments: {
+                        MOVE_SPEED: {
+                            type: ArgumentType.STRING,
+                            menu: 'moveSpeed', // 위에서 정의한 드롭다운 메뉴 사용
+                            defaultValue: '2'
+                        },
+                        LEFT_SENSOR: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 150,
+                            acceptReporters: true,
+                        },
+                        RIGHT_SENSOR: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 150,
+                            acceptReporters: true,
+                        },
+                    }
+                },
+
+                // 모터를 작동
+                {
+                    opcode: 'control_motor',
+                    blockType: BlockType.COMMAND,
+                    text: '[MOTOR_SELECTION] 모터를 [MOVE_DIRECTION] 방향으로 [MOVE_SPEED] 속도로 동작',
+                    arguments: {
+                        MOTOR_SELECTION: {
+                            type: ArgumentType.STRING,
+                            menu: 'turnDirection', // 위에서 정의한 드롭다운 메뉴 사용
+                            defaultValue: '0'
+                        },
+
+                        MOVE_DIRECTION: {
+                            type: ArgumentType.NUMBER,
+                            menu: 'motorDirection', // 위에서 정의한 드롭다운 메뉴 사용
+                            defaultValue: '1'
+                        },
+                        MOVE_SPEED: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 50,
+                            acceptReporters: true,
+                        },
+                    }
+                },
+
+                // 모터를 작동
+                {
+                    opcode: 'control_motor_time',
+                    blockType: BlockType.COMMAND,
+                    text: '[MOVE_TIME] 초 동안 왼쪽모터는 [MOVE_DIRECTION1] 방향으로 [MOVE_SPEED1] 속도로 오른쪽 모터는 [MOVE_DIRECTION2] 방향으로 [MOVE_SPEED2]로 동작',
+                    arguments: {
+
+                        MOVE_TIME: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 1,
+                            acceptReporters: true,
+                        },
+                        MOVE_DIRECTION1: {
+                            type: ArgumentType.NUMBER,
+                            menu: 'motorDirection', // 위에서 정의한 드롭다운 메뉴 사용
+                            defaultValue: '1'
+                        },
+                        MOVE_SPEED1: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 50,
+                            acceptReporters: true,
+                        },
+                        MOVE_DIRECTION2: {
+                            type: ArgumentType.NUMBER,
+                            menu: 'motorDirection', // 위에서 정의한 드롭다운 메뉴 사용
+                            defaultValue: '1'
+                        },
+                        MOVE_SPEED2: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 50,
+                            acceptReporters: true,
+                        },
 
 
                     }
                 },
 
+                // 지정된 속도와 방향으로 주미가 계속 이동하도록 명령
+                {
+                    opcode: 'move_infinite',
+                    blockType: BlockType.COMMAND,
+                    text: '[MOVE_DIRECTION] 방향으로 [MOVE_SPEED] 속도로 계속 이동',
+                    arguments: {
+                        MOVE_DIRECTION: {
+                            type: ArgumentType.STRING,
+                            menu: 'moveDirection', // 위에서 정의한 드롭다운 메뉴 사용
+                            defaultValue: '0'
+                        },
+                        MOVE_SPEED: {
+                            type: ArgumentType.STRING,
+                            menu: 'moveSpeed', // 위에서 정의한 드롭다운 메뉴 사용
+                            defaultValue: '2'
+                        },
+                    }
+                },
+
+                '---',
+
+                // 라인 감지 센서를 이용하여 라인을 따라 주미가 이동
+                // 지정된 시간 동안 또는 교차로를 감지할 때까지 작동
+                {
+                    opcode: 'linefollower',
+                    blockType: BlockType.COMMAND,
+                    text: '선을 따라 [LINE_TIME] 시간동안 [MOVE_SPEED] 속도로 직진, 좌 센서 [LEFT_SENSOR] / 우 센서 [RIGHT_SENSOR] / 가운데 센서 [CENTER_SENSOR] 이하 감지 시 멈춤 ',
+                    arguments: {
+                        MOVE_SPEED: {
+                            type: ArgumentType.STRING,
+                            menu: 'moveSpeed', // 위에서 정의한 드롭다운 메뉴 사용
+                            defaultValue: '2'
+                        },
+                        LEFT_SENSOR: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 100,
+                            acceptReporters: true,
+                        },
+                        RIGHT_SENSOR: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 100,
+                            acceptReporters: true,
+                        },
+                        CENTER_SENSOR: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 100,
+                            acceptReporters: true,
+                        },
+                        LINE_TIME: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 0,
+                            acceptReporters: true,
+                        },
+                    }
+                },
+
+
+                // 라인 감지 센서를 이용하여 라인을 따라 주미가 이동
+                // 라인을 따라 지정된 거리만큼 주미가 이동하도록 명령
+                {
+                    opcode: 'linefollower_distance',
+                    blockType: BlockType.COMMAND,
+                    text: '선을 따라 [MOVE_SPEED] 속도로 [LINE_DISTANCE] 거리만큼 이동 ',
+                    arguments: {
+                        MOVE_SPEED: {
+                            type: ArgumentType.STRING,
+                            menu: 'moveSpeed', // 위에서 정의한 드롭다운 메뉴 사용
+                            defaultValue: '2'
+                        },
+                        LINE_DISTANCE: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 0,
+                            acceptReporters: true,
+                        },
+                    }
+                },
+
+                // 라인 감지 센서를 이용하여 라인을 따라 주미가 이동
+                // 라인을 따라 지정된 속도로 계속 주미가 이동
+                {
+                    opcode: 'linefollower_infinite',
+                    blockType: BlockType.COMMAND,
+                    text: '선을 따라 [MOVE_SPEED] 속도로 계속 이동 ',
+                    arguments: {
+                        MOVE_SPEED: {
+                            type: ArgumentType.STRING,
+                            menu: 'moveSpeed', // 위에서 정의한 드롭다운 메뉴 사용
+                            defaultValue: '2'
+                        },
+                    }
+                },
+
+                '---',
+
+                // 주미의 모든 움직임을 즉시 멈춤
+                {
+                    opcode: 'move_stop',
+                    blockType: BlockType.COMMAND,
+                    text: '모터의 동작을 멈춤',
+                    arguments: {}
+                },
+
+
+                {
+                    opcode: 'test',
+                    blockType: BlockType.HAT,
+                    text: 'HAT',
+                    arguments: {}
+                },
+
+                {
+                    opcode: 'test1',
+                    blockType: BlockType.EVENT,
+                    text: 'EVENT',
+                    arguments: {}
+                },
+
+                {
+                    opcode: 'test2',
+                    blockType: BlockType.LOOP,
+                    text: 'LOOP',
+                    arguments: {}
+                },
+
+                {
+                    opcode: 'test3',
+                    blockType: BlockType.CONDITIONAL,
+                    text: 'CONDITIONAL',
+                    arguments: {}
+                },
+
+
+                {
+                    opcode: 'test5',
+                    blockType: BlockType.BUTTON,
+                    text: 'BUTTON',
+                    arguments: {}
+                },
+
+                '---',
+
+                //-- 버튼 값 boolean--///
+                {
+                    opcode: 'boolean_getBtnReading',
+                    blockType: BlockType.BOOLEAN,
+                    text: '[BTN_SEL] 버튼이 [BTN_STATE]',
+                    arguments: {
+                       BTN_SEL: {
+                            type: ArgumentType.STRING,
+                            menu: 'detectorBtn', // 위에서 정의한 드롭다운 메뉴 사용
+                            defaultValue: '8'
+                        },
+                       BTN_STATE: {
+                            type: ArgumentType.STRING,
+                            menu: 'btnPressed', // 위에서 정의한 드롭다운 메뉴 사용
+                            defaultValue: '0'
+                        },
+                    }
+                },
+
+                //-- 얼굴 인식 boolean--///
+                {
+                    opcode: 'boolean_face_cat_detect',
+                    blockType: BlockType.BOOLEAN,
+                    text: '[FACE_SEL] 이 감지 되었을 때',
+                    arguments: {
+                       FACE_SEL: {
+                            type: ArgumentType.STRING,
+                            menu: 'faceDetector', // 위에서 정의한 드롭다운 메뉴 사용
+                            defaultValue: 'zumiFaceDetected'
+                        },
+                    }
+                },
+
+                //-- 색상 인식 boolean--///
+                {
+                    opcode: 'boolean_color_detect',
+                    blockType: BlockType.BOOLEAN,
+                    text: '[COLOR_SEL] 이 감지 되었을 때',
+                    arguments: {
+                       COLOR_SEL: {
+                            type: ArgumentType.STRING,
+                            menu: 'colordetector', // 위에서 정의한 드롭다운 메뉴 사용
+                            defaultValue: '0'
+                        },
+                    }
+                },
+
+
+                //-- 마커 인식 boolean--///
+                {
+                    opcode: 'boolean_marker_detect',
+                    blockType: BlockType.BOOLEAN,
+                    text: '마커 [ID_SEL] 이 감지 되었을 때',
+                    arguments: {
+                       ID_SEL: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: '15'
+                        },
+                    }
+                },
+
+
+
+
+                '---',
 
                 //-- 버튼 값 --///
                 {
@@ -684,18 +1025,10 @@ class Scratch3Esp32Serial {
                     text: '버튼 값',
                     // 이 블록은 인수를 받지 않습니다.
                     arguments: {
-                        // SENSOR: {
-                        //     // 드롭다운 타입
-                        //     type: ArgumentType.STRING,
-                        //     // 위에서 정의한 메뉴 키를 참조합니다.
-                        //     menu: 'detectorBtn',
-                        //     // 드롭다운의 기본값 (선택 사항)
-                        //     defaultValue: '0'
-                        // }
                     }
                 },
 
-                //-- 버튼 값 --///
+                //-- 배터리 값 --///
                 {
                     // 이 opcode(고유 ID)는 위의 JavaScript 함수 이름과 일치해야 합니다.
                     opcode: 'getBatReading',
@@ -705,14 +1038,6 @@ class Scratch3Esp32Serial {
                     text: '배터리 잔량',
                     // 이 블록은 인수를 받지 않습니다.
                     arguments: {
-                        // SENSOR: {
-                        //     // 드롭다운 타입
-                        //     type: ArgumentType.STRING,
-                        //     // 위에서 정의한 메뉴 키를 참조합니다.
-                        //     menu: 'detectorBtn',
-                        //     // 드롭다운의 기본값 (선택 사항)
-                        //     defaultValue: '0'
-                        // }
                     }
                 },
 
@@ -849,17 +1174,45 @@ class Scratch3Esp32Serial {
 
 
 
-                    // detectorBtn: {
-                    //     acceptReporters: false,
-                    //     items: [
-                    //         { text: '없음', value: '0'},
-                    //         { text: '빨강', value: '1'},
-                    //         { text: '파랑', value: '2'},
-                    //         { text: '초록', value: '4'},
-                    //         { text: '노랑', value: '8'},
-                    //     ]
-                    // },
+                    detectorBtn: {
+                        acceptReporters: false,
+                        items: [
+                           // { text: '없음', value: '0'},
+                            { text: '빨강', value: '8'},
+                            { text: '파랑', value: '4'},
+                            { text: '초록', value: '2'},
+                            { text: '노랑', value: '1'},
+                        ]
+                    },
 
+                    btnPressed: {
+                        acceptReporters: false,
+                        items: [
+                            { text: '눌렸을 때', value: '0'},
+                            { text: '눌리지 않았을 때', value: '1'},
+                        ]
+                    },
+
+                    faceDetector: {
+                        acceptReporters: false,
+                        items: [
+                            { text: '얼굴', value: 'zumiFaceDetected'},
+                            { text: '고양이', value: 'zumiCatDetected'},
+                        ]
+                    },
+
+                    colordetector: {
+                        acceptReporters: false,
+                        items: [
+                            { text: '빨강', value: '0'},
+                            { text: '주황', value: '1'},
+                            { text: '노랑', value: '2'},
+                            { text: '녹색', value: '3'},
+                            { text: '청록', value: '4'},
+                            { text: '파랑', value: '5'},
+                            { text: '보라', value: '6'},
+                        ]
+                    },
 
                     detectorSelector: {
                         acceptReporters: false,
@@ -933,6 +1286,16 @@ class Scratch3Esp32Serial {
                             { text: '뒤', value: '1' }
                         ]
                     },
+
+                    motorDirection: {
+                        items: [
+                            { text: '정지', value: '0' },
+                            { text: '전진 방향', value: '1' },
+                            { text: '후진 방향', value: '2' },
+                        ]
+                    },
+
+
 
                     turnDirection: {
                         items: [
@@ -1047,6 +1410,10 @@ class Scratch3Esp32Serial {
          //   this.writer = this.serialPort.writable.getWriter();
             this.readSerial(); // 데이터 수신 시작
 
+            // ⭐️ 포트가 성공적으로 열렸으므로 주기적 전송 루프 시작 ⭐️
+            this.startSendingLoop();
+
+
         } catch (error) {
             console.error('Serial port connection failed:', error);
             this.serialPort = null;
@@ -1062,6 +1429,7 @@ class Scratch3Esp32Serial {
             if (this.reader) await this.reader.cancel();
            // if (this.writer) await this.writer.releaseLock();
             await this.serialPort.close();
+            this.isLoopRunning = false; // 루프 중지 플래그 설정
             this.serialPort = null;
             this.reader = null;
            // this.writer = null;
@@ -1134,25 +1502,131 @@ class Scratch3Esp32Serial {
      */
     getCatDetectReading(args) {
         const detectKey = args.DETECT;
-        return this._detectReading(detectKey)
+
+        var result = 0;
+
+        var detect = this.zumiCatDetected;
+
+        if(detectKey == 'zumiCatDetected')
+        {
+            result = detect;
+        }
+        else if(detectKey == 'zumiCatCenter[0]')
+        {
+            let Xg = this.zumiCatCenter[0];
+
+            if (detect == 0x00) result = -999;
+            else result = ((200 / 2) - Xg) + 20;
+        }
+        else if(detectKey == 'zumiCatCenter[1]')
+        {
+            let Yg = this.zumiCatCenter[1];
+
+            if (detect == 0x00) result = -999;
+            else result = ((200 / 2) - Yg) + 30;
+        }
+        return result;
     }
 
     getHumanDetectReading(args) {
         const detectKey = args.DETECT;
-        return this._detectReading(detectKey)
+
+        var result = 0;
+
+        var detect = this.zumiFaceDetected;
+
+        if(detectKey == 'zumiFaceDetected')
+        {
+            result = detect;
+        }
+        else if(detectKey == 'zumiFaceCenter[0]')
+        {
+            let Xg = this.zumiFaceCenter[0];
+
+            if (detect == 0x00) result = -999;
+            else result = ((200 / 2) - Xg) + 10;
+        }
+        else if(detectKey == 'zumiFaceCenter[1]')
+        {
+            let Yg = this.zumiFaceCenter[1];
+
+            if (detect == 0x00) result = -999;
+            else result = ((200 / 2) - Yg) + 35;
+        }
+        return result;
     }
 
     getMarkerDetectReading(args) {
         const detectKey = args.DETECT;
-       return this._detectReading(detectKey)
+
+        var result = 0;
+        var id = this.zumiMarkerDetected;
+
+        if(detectKey == 'zumiMarkerDetected')
+        {
+            result = id;
+
+            if(id <11) result +=1;
+            else if(id == 14) result = 12;
+            else if(id == 15) result = 13;
+            else if(id == 16) result = 14;
+            else if(id == 18) result = 15;
+            else if(id == 19) result = 16;
+            else if(id == 20) result = 17;
+
+            else if(id == 0xFE) result = -1;
+        }
+        else if(detectKey == 'zumiMarkerCenter[0]')
+        {
+            let Xg = this.zumiMarkerCenter[0];
+            if(id == 0xFE) result = -999;
+            else result = (200 / 2) - Xg;
+        }
+        else if (detectKey == 'zumiMarkerCenter[1]')
+        {
+            let Yg = this.zumiMarkerCenter[1];
+            if (id == 0xFE) result = -999;
+            else result = ((200 / 2) - Yg)+ 35;
+        }
+
+        return result;
     }
 
     getColorDetectReading(args) {
         const detectKey = args.DETECT;
-       return this._detectReading(detectKey)
+
+        var result = 0;
+        var color = this.zumiColorDetected;
+
+        if(detectKey == 'zumiColorDetected')
+        {
+            result = color;
+
+            if((color == 0xFE)) result = 'NONE';
+            else if (color == 0x00)  result = 'RED';
+            else if (color == 0x01)  result = 'ORANGE';
+            else if (color == 0x02)  result = 'YELLOW';
+            else if (color == 0x03)  result = 'GREEN';
+            else if (color == 0x04)  result = 'CYAN';
+            else if (color == 0x05)  result = 'BLUE';
+            else if (color == 0x06)  result = 'PURPLE';
+
+        }
+        else if(detectKey == 'zumiColorCenter[0]')
+        {
+            let Xg = this.zumiColorCenter[0];
+            if (color == 0xFE) result = -999;
+            else result = ((200 / 2) - Xg) +20;
+        }
+        else if (detectKey == 'zumiColorCenter[1]')
+        {
+            let Yg = this.zumiColorCenter[1];
+            if (color == 0xFE) result = -999;
+            else result = ((200 / 2) - Yg) +35;
+        }
+        return result;
+
     }
-
-
 
     _detectReading(detectKey) {
         if (this.hasOwnProperty(detectKey)) {
@@ -1184,6 +1658,94 @@ class Scratch3Esp32Serial {
 
         // 해당 속성이 없거나 유효하지 않은 경우 0을 반환합니다.
         return 0;
+    }
+
+
+    boolean_getBtnReading(args) {
+        // this.dataStore는 ZumiDataStore의 인스턴스입니다.
+       // console.log(this.btn);
+        let _btn = parseInt(args.BTN_SEL); // 0 (왼쪽) 또는 1 (오른쪽)
+        let _stat = parseInt(args.BTN_STATE); // 0 (왼쪽) 또는 1 (오른쪽)
+
+        let bStat = this.btn;
+
+        var result = false;
+
+        //console.log(_btn, _stat, bStat);
+
+        if (_stat == 0) //press
+        {
+            if((_btn == 8)&&(bStat == 8)) result = true;
+            else if((_btn == 4) && (bStat == 4)) result = true;
+            else if((_btn == 2) && (bStat == 2)) result = true;
+            else if((_btn == 1) && (bStat == 1)) result = true;
+            else result = false;
+        }
+        else if (_stat == 1) //release
+        {
+            if ((_btn == 8) && (bStat == 8)) result = false;
+            else if ((_btn == 4) && (bStat == 4)) result = false;
+            else if ((_btn == 2) && (bStat == 2)) result = false;
+            else if ((_btn == 1) && (bStat == 1)) result = false;
+            else result = true;
+        }
+
+        return result;
+    }
+
+
+    boolean_face_cat_detect(args) {
+
+        const detectKey = args.FACE_SEL;
+
+        if(detectKey == 'zumiFaceDetected')
+        {
+            return this.zumiFaceDetected;
+        }
+        else //if(detectKey == 'zumiCatDetected')
+        {
+            return this.zumiCatDetected;
+        }
+    }
+
+    boolean_color_detect(args) {
+
+        let col = parseInt(args.COLOR_SEL);
+        let result = this.zumiColorDetected;
+
+      //  console.log(col, result);
+
+        if ((result == 0x00) && (col == '0')) result = true;
+        else if ((result == 0x01) && (col == '1')) result = true;
+        else if ((result == 0x02) && (col == '2')) result = true;
+        else if ((result == 0x03) && (col == '3')) result = true;
+        else if ((result == 0x04) && (col == '4')) result = true;
+        else if ((result == 0x05) && (col == '5')) result = true;
+        else if ((result == 0x06) && (col == '6')) result = true;
+        else result = false;
+
+        return result;
+    }
+
+    boolean_marker_detect(args) {
+
+        let id = parseInt(args.ID_SEL);
+        let result = this.zumiMarkerDetected;
+
+      //  console.log(col, result);
+
+        if(result <11) result +=1;
+        else if(result == 14) result = 12;
+        else if(result == 15) result = 13;
+        else if(result == 16) result = 14;
+        else if(result == 18) result = 15;
+        else if(result == 19) result = 16;
+        else if(result == 20) result = 17;
+
+        if(id == result) result = true;
+        else result = false;
+
+        return result;
     }
 
     /**
@@ -1295,7 +1857,7 @@ class Scratch3Esp32Serial {
         this.zumiCatCenter[0] = dataArray[PacketIndex.DATA_DETECT_CAT_X - offset];
         this.zumiCatCenter[1] = dataArray[PacketIndex.DATA_DETECT_CAT_Y - offset];
 
-        //console.log(this.senFR);
+        //console.log(this.zumiMarkerDetected);
     }
 
     /**
@@ -1730,13 +2292,12 @@ class Scratch3Esp32Serial {
     // ===============================================
 
     //지정된 거리만큼 주미를 전진시킵니다.
-    forward_dist(args) {
-
-        return this._send_move_dist(parseInt(args.MOVE_SPEED), parseInt(args.MOVE_DIST), parseInt(args.MOVE_DIRECTION));
-    }
-
-    _send_move_dist(speed, dist, dir)
+    move_dist(args)
     {
+        let speed = parseInt(args.MOVE_SPEED);
+        let dir = parseInt(args.MOVE_DIRECTION);
+        let dist = parseInt(args.MOVE_DIST);
+
         if(speed < 1) {speed = 1};
         if(speed > 3) {speed = 3};
 
@@ -1754,6 +2315,38 @@ class Scratch3Esp32Serial {
         );
     }
 
+    // 빠르게 지정된 거리 만큼 이동
+    move_dist_quick(args) {
+
+        let dir = parseInt(args.MOVE_DIRECTION);
+        let dist = parseInt(args.MOVE_DIST);
+
+        if(dir < 0) {dir = 0};
+        if(dir > 1) {dir = 1};
+
+        if(dist < 0) {dist = 0};
+        if(dist > 300) {dist = 300};
+
+        if(dir == 0)
+        {
+            return this.sendCommand(
+                CommandType.COMMAND_QUICK_GOGO,
+                dist,
+            );
+        }
+        else
+        {
+            return this.sendCommand(
+                CommandType.COMMAND_QUICK_GOBACK,
+                dist,
+            );
+        }
+
+    }
+
+
+
+
     // 회전
     /**
      * 지정된 방향, 각도, 속도로 주미 로봇을 회전시키는 명령을 전송합니다.
@@ -1762,21 +2355,10 @@ class Scratch3Esp32Serial {
      */
 
     turn_angle(args) {
-        // 1. 인수 가져오기 및 범위 확인 (파이썬 로직 반영)
+
         let dir = parseInt(args.TURN_DIRECTION); // 0 (왼쪽) 또는 1 (오른쪽)
         let deg = Math.round(parseFloat(args.TURN_ANGLE)); // 각도는 정수화
         let speed = parseInt(args.TURN_SPEED);
-
-        return this._sendTurnCommand(speed, deg, dir);
-    }
-
-
-    _sendTurnCommand(speed, deg, dir) {
-        // // 1. 인수 가져오기 및 범위 확인 (파이썬 로직 반영)
-        // let speed = parseInt(args.SPEED);
-        // let deg = Math.round(parseFloat(args.DEGREE)); // 각도는 정수화
-        // let dir = parseInt(args.DIRECTION); // 0 (왼쪽) 또는 1 (오른쪽)
-
 
         // 속도 제한 (1~3)
         if (speed < 1) speed = 1;
@@ -1810,10 +2392,246 @@ class Scratch3Esp32Serial {
         // 이 함수는 command 블록이므로 값을 반환하지 않거나 Promise를 반환합니다.
     }
 
+    // 빠르게 지정된 각도만큼 회전
+    turn_angle_quick(args) {
+
+        let dir = parseInt(args.TURN_DIRECTION); // 0 (왼쪽) 또는 1 (오른쪽)
+        let deg = Math.round(parseFloat(args.TURN_ANGLE)); // 각도는 정수화
+
+        if (deg > 360) {
+            deg = 360;
+        }
+
+        // Math.floor()를 사용하여 정수형 나누기(int(deg / 5))를 구현합니다.
+        deg = Math.floor(deg / 5);
+
+        if(dir == 0)
+        {
+            return this.sendCommand(
+                CommandType.COMMAND_QUICK_LEFT,
+                deg,
+            );
+        }
+        else
+        {
+            return this.sendCommand(
+                CommandType.COMMAND_QUICK_RIGHT,
+                deg,
+            );
+        }
+    }
+
+    // 전방 센서에 무언가가 감지될 때까지 주미가 직진
+    go_sensor(args)
+    {
+        let speed = parseInt(args.MOVE_SPEED); // 0 (왼쪽) 또는 1 (오른쪽)
+        let senL = parseInt(args.LEFT_SENSOR); // 0 (왼쪽) 또는 1 (오른쪽)
+        let senR = parseInt(args.RIGHT_SENSOR); // 0 (왼쪽) 또는 1 (오른쪽)
+
+        if(speed < 1) speed = 1
+        if(speed > 3) speed = 3
+
+        if(senL < 0) senL = 0
+        if(senL > 255) senL = 255
+
+        if(senR < 0) senR = 0
+        if(senR > 255) senR = 255
+
+        return this.sendCommand(
+            CommandType.COMMAND_GOSENSOR,
+            speed,
+            senL,
+            senR
+        );
+    }
+
+
+    // 지정된 속도와 방향으로 주미가 계속 이동하도록 명령
+    move_infinite(args)
+    {
+        let dir = parseInt(args.MOVE_DIRECTION);
+        let speed = parseInt(args.MOVE_SPEED);
+
+        if(speed < 1) {speed = 1};
+        if(speed > 3) {speed = 3};
+
+        if(dir < 0) {dir = 0};
+        if(dir > 1) {dir = 1};
+
+        return this.sendCommand(
+            CommandType.COMMAND_GO_INFINITE,
+            speed,
+            0,
+            dir
+        );
+    }
+
+
+    //  모터를 작동
+    control_motor(args)
+    {
+        let sel = parseInt(args.MOTOR_SELECTION); // 0 (왼쪽) 또는 1 (오른쪽)
+        let dir = parseInt(args.MOVE_DIRECTION);
+        let speed = parseInt(args.MOVE_SPEED);
+
+        if (speed < 0) speed = 0;
+        else if (speed > 250) speed = 250;
+
+        if(dir < 0) dir = 0
+        if(dir > 2) dir = 2
+
+        //10단계
+        if(sel == 0) //왼쪽 모터
+        {
+            if(dir == 1) dir = 2;
+            else if(dir == 2) dir = 1;
+
+            this.tSpd1 = speed;
+            this.tDir = this.tDir & 0b11110000;
+            this.tDir = this.tDir | dir;
+        }
+
+        else //오른쪽 모터
+        {
+            this.tSpd2 = speed;
+            this.tDir = this.tDir & 0b11001111;
+            this.tDir = this.tDir | (dir<<4)
+        }
+
+        return this.sendCommand(
+            CommandType.COMMAND_MOTOR1_INFINITE,
+            this.tSpd1,
+            this.tSpd2,
+            this.tDir
+        );
+
+    }
+
+    control_motor_time(args)
+    {
+        let time = args.MOVE_TIME; // 0 (왼쪽) 또는 1 (오른쪽)
+
+        let dirL = parseInt(args.MOVE_DIRECTION1);
+        let speedL = parseInt(args.MOVE_SPEED1);
+
+        let dirR = parseInt(args.MOVE_DIRECTION2);
+        let speedR = parseInt(args.MOVE_SPEED2);
+
+        time = parseInt(time * 10)
+        if(time < 0) time = 0;
+        if(time > 250) time = 250;
+
+        if(time == 1) time = 2;
+
+
+        if(speedL < 0) speedL = 0;
+        if(speedR > 250) speedL = 250;
+
+        if(speedR < 0) speedR = 0;
+        if(speedR > 250) speedR = 250;
+
+        if(dirL < 0) dirL = 0;
+        if(dirL > 2) dirL = 2;
+        if(dirR < 0) dirR = 0;
+        if(dirR > 2) dirR = 2;
+
+        let dir = 0b01000000;
+        dir = dir | dirL;
+        dir = dir | (dirR<<4);
+
+        return this.sendCommand(
+            CommandType.COMMAND_MOTOR_TIME,
+            speedL,
+
+            speedR,
+            dir,
+            time
+        );
+
+    }
+
+
+    // 라인 감지 센서를 이용하여 라인을 따라 주미가 이동
+    linefollower(args)
+    {
+        let speed = parseInt(args.MOVE_SPEED); // 0 (왼쪽) 또는 1 (오른쪽)
+        let senBL = parseInt(args.LEFT_SENSOR); // 0 (왼쪽) 또는 1 (오른쪽)
+        let senBR = parseInt(args.RIGHT_SENSOR); // 0 (왼쪽) 또는 1 (오른쪽)
+        let senBC = parseInt(args.CENTER_SENSOR); // 0 (왼쪽) 또는 1 (오른쪽)
+        let time = args.LINE_TIME; // 0 (왼쪽) 또는 1 (오른쪽)
+
+
+        if(speed < 0)  speed = 0;
+        if(speed > 3)  speed = 3;
+
+        if(senBL < 0) senBL = 0;
+        if(senBL > 255) senBL = 255;
+
+        if(senBR < 0) senBR = 0;
+        if(senBR > 255) senBR = 255;
+
+        if(senBC < 0) senBC = 0;
+        if(senBC > 255) senBC = 255;
+
+        time = parseInt(time * 10);
+        if(time < 0) time = 0;
+        if(time > 250) time = 250;
+
+        return this.sendCommand(
+            CommandType.COMMAND_LINE_TRACING,
+            speed,
+            senBL,
+            senBR,
+            senBC,
+            time
+        );
+    }
+
+    // 라인을 따라 지정된 거리만큼 주미가 이동하도록 명령
+    linefollower_distance(args)
+    {
+        let speed = parseInt(args.MOVE_SPEED); // 0 (왼쪽) 또는 1 (오른쪽)
+        let dist = parseInt(args.LINE_DISTANCE); // 0 (왼쪽) 또는 1 (오른쪽)
+
+        if(speed < 0) speed = 0;
+        if(speed > 3) speed = 3;
+
+        if(dist < 0) dist = 0;
+        if(dist > 255) dist = 255;
+
+        return this.sendCommand(
+            CommandType.COMMAND_LINE_TRACE_DIST,
+            speed,
+            dist,
+        );
+
+    }
+
+    // 라인을 따라 지정된 속도로 계속 주미가 이동
+    linefollower_infinite(args)
+    {
+        let speed = parseInt(args.MOVE_SPEED); // 0 (왼쪽) 또는 1 (오른쪽)
+
+        if(speed < 0) speed = 0;
+        if(speed > 3) speed = 3;
+
+        return this.sendCommand(
+            CommandType.COMMAND_TRACE_INFINITE,
+            speed,
+        );
+
+    }
 
 
 
 
+    move_stop(args)
+    {
+        return this.sendCommand(
+            CommandType.COMMAND_MOTION_STOP
+        );
+
+    }
 
     // ===============================================
     // 개별 블록 함수 (기타)
@@ -1825,7 +2643,7 @@ class Scratch3Esp32Serial {
     ledPattern(args){
         // 24 52 0A 00 0A 0A 0A
         const pattern = parseInt(args.PATTERN);
-        const timeInSeconds = parseInt(args.TIME);
+        const timeInSeconds = parseFloat(args.TIME);
 
         // console.log(r,g,b)
 
@@ -1985,7 +2803,7 @@ class Scratch3Esp32Serial {
 
        // if (!this.writer) return;
 
-        console.log("sendCommand")
+        //console.log("sendCommand")
         // if (!this.port || !this.port.writable) {
         //     console.warn("Serial port is not connected or writable. Cannot send command.");
         //     return;
@@ -2010,85 +2828,17 @@ class Scratch3Esp32Serial {
             payloadBytes[i + 1] = params[i] & 0xFF;
         }
 
-        //console.log(paramLength)
-        return this.transferData(payloadBytes)
-        /*
-        //this._currentRequest = 0x01; //test
+        //console.log(payloadBytes);
+
+
+        //this._current_request = 0x01; //test
 
         // 2. 전체 전송 데이터 배열 구성 (파이썬 makeTransferDataArray 역할)
         const HEADER1 = 0x24; // '$'
         const HEADER2 = 0x52; // 'R'
-        const REQUEST_BYTE = this._currentRequest || 0x00;
-
-        // 전체 메시지 길이: 헤더(2) + 커맨드(1) + 리퀘스트(1) + 파라미터(paramLength)
-        const fullMessageLength = 4 + paramLength;
-
-        const dataArray = new Uint8Array(fullMessageLength);
-        let index = 0;
-
-        // 2.1 헤더 ($R)
-        dataArray[index++] = HEADER1;
-        dataArray[index++] = HEADER2;
-
-        // 2.2 커맨드 바이트
-        dataArray[index++] = payloadBytes[0];
-
-        // 2.3 리퀘스트 바이트
-        dataArray[index++] = REQUEST_BYTE;
-
-        // 2.4 파라미터 데이터
-        // payloadBytes.slice(1)은 commandType을 제외한 파라미터들만 포함 (파이썬 data[1:]에 해당)
-        dataArray.set(payloadBytes.slice(1), index);
-
-        // 3. 전송
-        //const writer = this.port.writable.getWriter();
-        // try {
-        //     //await writer.write(dataArray);
-        //     await this.writer.write(dataArray);
-        //     console.log("Sent Data Array (Hex):", Array.from(dataArray).map(b => b.toString(16).padStart(2, '0')).join(' '));
-        //     this.writer.releaseLock();
-        // } catch (error) {
-        //     console.error("Serial Write Error:", error);
-        // } finally {
-        // }
-
-        let writer = null;
-        try {
-                // 2. 명령을 보낼 때마다 새로운 writer 객체를 획득 (락 획득)
-                writer = this.serialPort.writable.getWriter();
-
-                // 3. 쓰기 작업
-                await writer.write(dataArray);
-
-                console.log("SUCCESS: sendCommand.");
-
-            } catch (error) {
-                // 락 획득 또는 쓰기 작업 중 오류 발생 시
-                console.error("Serial Write Error:", error);
-
-            } finally {
-                // 4. 오류 여부와 관계없이 락 해제
-                if (writer) {
-                    writer.releaseLock();
-                }
-            }
-    */
-
-
-    }
-
-    async transferData(payloadBytes) {
-
-        //this._currentRequest = 0x01; //test
-
-        // 2. 전체 전송 데이터 배열 구성 (파이썬 makeTransferDataArray 역할)
-        const HEADER1 = 0x24; // '$'
-        const HEADER2 = 0x52; // 'R'
-        const REQUEST_BYTE = this._currentRequest || 0x00;
-
+        //const REQUEST_BYTE = this._current_request || 0x00;
 
         //console.log(payloadBytes.length)
-
 
         // 전체 메시지 길이: 헤더(2) + 커맨드(1) + 리퀘스트(1) + 파라미터(paramLength)
         const fullMessageLength = 4 + payloadBytes.length-1;
@@ -2110,6 +2860,62 @@ class Scratch3Esp32Serial {
         // payloadBytes.slice(1)은 commandType을 제외한 파라미터들만 포함 (파이썬 data[1:]에 해당)
         dataArray.set(payloadBytes.slice(1), index);
 
+
+
+//console.log(dataArray);
+
+
+        // 2. 데이터를 큐에 넣습니다
+      //  this.sendQueue.push(dataArray);
+    // 1. 새로운 명령으로 단일 버퍼를 덮어씁니다.
+        this.nextCommandPayload = dataArray;
+
+        //console.log(paramLength)
+       // return this.transferData(payloadBytes)
+
+
+
+    }
+
+    async transferData(dataArray) {
+
+        if (!this.serialPort || !this.serialPort.writable) {
+                console.warn("Port not ready. Cannot transfer.");
+                return;
+            }
+
+
+        // //this._current_request = 0x01; //test
+
+        // // 2. 전체 전송 데이터 배열 구성 (파이썬 makeTransferDataArray 역할)
+        // const HEADER1 = 0x24; // '$'
+        // const HEADER2 = 0x52; // 'R'
+        // const REQUEST_BYTE = this._current_request || 0x00;
+
+
+        // //console.log(payloadBytes.length)
+
+
+        // // 전체 메시지 길이: 헤더(2) + 커맨드(1) + 리퀘스트(1) + 파라미터(paramLength)
+        // const fullMessageLength = 4 + payloadBytes.length-1;
+
+        // const dataArray = new Uint8Array(fullMessageLength);
+        // let index = 0;
+
+        // // 2.1 헤더 ($R)
+        // dataArray[index++] = HEADER1;
+        // dataArray[index++] = HEADER2;
+
+        // // 2.2 커맨드 바이트
+        // dataArray[index++] = payloadBytes[0];
+
+        // // 2.3 리퀘스트 바이트
+        // dataArray[index++] = this._current_request;
+
+        // // 2.4 파라미터 데이터
+        // // payloadBytes.slice(1)은 commandType을 제외한 파라미터들만 포함 (파이썬 data[1:]에 해당)
+        // dataArray.set(payloadBytes.slice(1), index);
+
         // 3. 전송
         //const writer = this.port.writable.getWriter();
         // try {
@@ -2122,6 +2928,9 @@ class Scratch3Esp32Serial {
         // } finally {
         // }
 
+
+
+        this.isSending = true; // 전송 시작 플래그 ON
         let writer = null;
         try {
                 // 2. 명령을 보낼 때마다 새로운 writer 객체를 획득 (락 획득)
@@ -2143,10 +2952,78 @@ class Scratch3Esp32Serial {
                 if (writer) {
                     writer.releaseLock();
                 }
+                this.isSending = false; // 전송 완료/실패 후 플래그 OFF
             }
     }
 
+    // 루프 시작 함수 (connectPort 성공 시 호출)
+    startSendingLoop() {
+        if (this.isLoopRunning) return;
+        this.isLoopRunning = true;
+        console.log("Starting 50ms sending loop...");
 
+        // ⭐️ 첫 호출 시 바로 실행하고, 재귀적으로 setTimeout을 사용하여 주기를 제어합니다. ⭐️
+        this.sendingLoop();
+    }
+
+    // 50ms마다 실행될 실제 루프
+    async sendingLoop() {
+        const startTime = Date.now();
+
+        // 1. 현재 전송 중이 아니라면, 데이터를 보낼지 결정
+        if (!this.isSending && this.serialPort && this.serialPort.writable) {
+            let dataToSend;
+
+            if (this.nextCommandPayload) {
+                // 2. 보낼 데이터가 있다면 큐에서 꺼냄 (명령 데이터)
+                dataToSend = this.nextCommandPayload;
+                this.nextCommandPayload = null; // 사용했으므로 버퍼 비우기
+
+                //console.log(dataToSend)
+                await this.transferData(dataToSend);
+            }
+            else {
+                // 3. 보낼 데이터가 없다면 기본 ACK/유지 명령을 보냄 (50ms 주기 유지)
+                // ACK/Heartbeat 명령의 payloadBytes를 여기에 직접 만듭니다.
+                // (예: COMMAND_WAIT를 0바이트로 전송하거나, 별도의 ACK 커맨드를 정의해야 함)
+                // 임시: COMMAND_GOGO (파라미터 0개)를 ACK처럼 사용
+               // const commandType = CommandType.COMMAND_NONE;
+               // dataToSend = new Uint8Array([commandType]);
+
+              //  const sendACK= [0x24,0x52,0x00,this._current_request,0x00,0x00,0x00,0x00,0x00,0xFF,0xFF]; //stop
+                // 올바른 Uint8Array 형식으로 변경
+                const sendACK = new Uint8Array([
+                    0x24, // HEADER1 '$'
+                    0x52, // HEADER2 'R'
+                    0x00, // COMMAND_TYPE (예: ACK/NOP)
+                    this._current_request,
+                    0x00, 0x00, 0x00, 0x00, 0x00, // 파라미터 및 기타 데이터
+                    0xFF, 0xFF // 아마도 패킷 끝/체크섬 등
+                ]);
+
+               // console.log(sendACK)
+
+                await this.transferData(sendACK); // 디버그 시 정지
+
+            }
+
+            // 데이터 전송 실행 (비동기로 실행되나, 다음 루프를 막지는 않음)
+            // transferData를 사용하여 락 획득/해제는 내부에서 처리
+
+        }
+
+        // 2. 남은 시간 계산 후 다음 루프 예약
+        const elapsedTime = Date.now() - startTime;
+        // 50ms 주기를 유지하도록 딜레이를 계산합니다.
+        const delay = Math.max(0, 150 - elapsedTime);
+
+        // ⭐️ setTimeout을 사용하여 다음 루프 실행을 예약합니다.
+        if (this.isLoopRunning) {
+            setTimeout(() => {
+                this.sendingLoop(); // 자기 자신을 다시 호출하여 루프를 지속
+            }, delay);
+        }
+    }
 
 }
 
