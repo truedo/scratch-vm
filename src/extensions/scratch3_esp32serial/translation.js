@@ -1,6 +1,11 @@
 // scratch-vm/src/extensions/scratch3_esp32serial/translation.js
 
 
+export const Form_Name = {
+    'en': 'Zumi AI',
+    'ko': '주미 AI'
+    // 다른 언어 추가 가능
+};
 
 
 export const Form_groupConnect = {
@@ -156,7 +161,7 @@ export const Form_go_sensor = {
 
 export const Form_linefollower = {
     'en': 'Follow line for [LINE_TIME] seconds at [MOVE_SPEED] speed, stop if left < [LEFT_SENSOR] / right < [RIGHT_SENSOR] / center < [CENTER_SENSOR]',
-    'ko': '선을 따라 [LINE_TIME] 시간동안 [MOVE_SPEED] 속도로 직진, 좌 센서 [LEFT_SENSOR] / 우 센서 [RIGHT_SENSOR] / 가운데 센서 [CENTER_SENSOR] 이하 감지 시 멈춤 ',
+    'ko': '선을 따라 [LINE_TIME] 초 동안 [MOVE_SPEED] 속도로 직진, 좌 센서 [LEFT_SENSOR] / 우 센서 [RIGHT_SENSOR] / 가운데 센서 [CENTER_SENSOR] 이하 감지 시 멈춤 ',
 };
 
 export const Form_linefollower_distance = {
