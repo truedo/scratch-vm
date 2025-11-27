@@ -133,6 +133,7 @@ export const Form_move_dist_quick = {
 
 export const Form_turn_angle = {
     'en': 'Turn [TURN_ANGLE] degrees in [TURN_DIRECTION] direction at [TURN_SPEED] speed',
+    'ko': '[TURN_DIRECTION] 방향으로 [TURN_ANGLE] 도를 [TURN_SPEED] 속도로 회전',
 };
 export const Form_turn_angle_quick = {
     'en': 'Quickly turn [TURN_ANGLE] degrees in [TURN_DIRECTION] direction',
