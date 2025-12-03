@@ -96,6 +96,7 @@ const {
 
 } = require('./translation');
 
+
 const iconURI = 'data:image/png;base64,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';
 
 let theLocale = null;
@@ -305,15 +306,29 @@ const PacketIndex = {
     DATA_DETECT_CAT_Y: 25
 };
 
-class Scratch3Esp32Serial {
+
+class Scratch3Esp32Bluetooth {
+
+    // Zumi AI 장치에서 사용되는 UUID 상수
+    static SERVICE_UUID = '0000fff0-0000-1000-8000-00805f9b34fb';
+    static CHARACTERISTIC_UUID = '0000fff1-0000-1000-8000-00805f9b34fb';
+    static DEVICE_NAME = 'zumi';
+    // [NEW] 고정 HEX 패킷 정의: 24 52 0A 00 0A 0A 0A (7 바이트)
+
+
     constructor (runtime) {
+
+
+        this.characteristic = null;
+        this.device = null;
+        console.log("Zumi Bluetooth Extension 초기화됨.");
 
         this.sendingLoopTime = 150;//basic 150ms
 
        // the_locale = this._setLocale();
         this.runtime = runtime;
-        this.serialPort = null;
-        this.reader = null;
+        //this.serialPort = null;
+        //this.reader = null;
         this.receivedData = '';
 
 
@@ -328,11 +343,10 @@ class Scratch3Esp32Serial {
 
         this.motorTrigger = false;
 
-        // Web Serial API 지원 여부 확인
-        if ('serial' in navigator) {
-            console.log("Web Serial API is supported.");
+        if ('bluetooth' in navigator) {
+            console.log("Web Bluetooth API가 지원됩니다.");
         } else {
-            console.error("Web Serial API is not supported in this browser.");
+            console.error("이 브라우저에서는 Web Bluetooth API를 지원하지 않습니다 (Chrome/Edge 사용 권장).");
         }
 
         // 통신 상태 (StateLoading)
@@ -370,7 +384,7 @@ class Scratch3Esp32Serial {
         this.receiverIndex = 0;
         this.receiverBuffer = [];
         this.receiverData = [];
-        this.receiverMessage = null;
+        //this.receiverMessage = null;
         this.receiverSectionOld = this.Section.End;
 
         // === [상태 플래그 및 기본 데이터] ===
@@ -397,13 +411,13 @@ class Scratch3Esp32Serial {
         this.zumiCatDetected = 0;
         this.zumiCatCenter = [0, 0];
 
-        this.connectPort();
 
+        this.connectDevice();
 
         this.runtime.on('PROJECT_STOP_ALL', () => {
             //"// 플래그 초기화"
             console.log("PROJECT_STOP_ALL");
-            this.move_stop();
+           // this.move_stop();
         });
 
     }
@@ -435,10 +449,11 @@ class Scratch3Esp32Serial {
        // the_locale = this._setLocale();
         //this.connectPort();
         //console.log("_setLocale");
-        theLocale = this._setLocale (); //언어 설정 읽어오기
+
+        theLocale = this._setLocale(); //언어 설정 읽어오기
 
         return {
-            id: 'zumiAIS',
+            id: 'zumiAIB',
 
             // color1: '#4C97FF',
             // color2: '#3373CC',
@@ -494,6 +509,18 @@ class Scratch3Esp32Serial {
                     blockType: BlockType.REPORTER,
                     text: Form_getConnectState[theLocale],
                     arguments: {}
+                },
+                '---',
+                {
+                    opcode: 'toggleNotify',
+                    blockType: BlockType.COMMAND,
+                    text: '데이터 알림 [STATE] 설정',
+                    arguments: {
+                        STATE: {
+                            type: ArgumentType.STRING,
+                            menu: 'notifyMenu'
+                        }
+                    }
                 },
                 '---',
 
@@ -1115,243 +1142,250 @@ class Scratch3Esp32Serial {
                         },
                     }
                 },
+
+
             ],
+
 
             //---------------------------------------------------//
             // 메뉴 목록
             //---------------------------------------------------//
             menus: {
-                    lineChangeSelector: {
-                        acceptReporters: false,
-                        items: [
-                            { text: Menu_lineChangeSelector.on[theLocale], value: 'on' },
-                            { text: Menu_lineChangeSelector.off[theLocale], value: 'off' }
-                        ]
-                    },
+                notifyMenu: {
+                    acceptsReporters: true,
+                    items: ['활성화', '비활성화']
+                },
 
-                    detectorBtn: {
-                        acceptReporters: false,
-                        items: [
-                            { text: Menu_colordetector.red[theLocale], value: '8' },
-                            { text: Menu_colordetector.blue[theLocale], value: '4' },
-                            { text: Menu_colordetector.green[theLocale], value: '2' },
-                            { text: Menu_colordetector.yellow[theLocale], value: '1' },
-                        ]
-                    },
+                lineChangeSelector: {
+                    acceptReporters: false,
+                    items: [
+                        { text: Menu_lineChangeSelector.on[theLocale], value: 'on' },
+                        { text: Menu_lineChangeSelector.off[theLocale], value: 'off' }
+                    ]
+                },
 
-                    btnPressed: {
-                        acceptReporters: false,
-                        items: [
-                            { text: Menu_btnPressed.pressed[theLocale], value: '0'},
-                            { text: Menu_btnPressed.notPressed[theLocale], value: '1'},
-                        ]
-                    },
+                detectorBtn: {
+                    acceptReporters: false,
+                    items: [
+                        { text: Menu_colordetector.red[theLocale], value: '8' },
+                        { text: Menu_colordetector.blue[theLocale], value: '4' },
+                        { text: Menu_colordetector.green[theLocale], value: '2' },
+                        { text: Menu_colordetector.yellow[theLocale], value: '1' },
+                    ]
+                },
 
-                    faceDetector: {
-                        acceptReporters: false,
-                        items: [
-                            { text: Menu_detectorSelector.face[theLocale], value: 'zumiFaceDetected'},
-                            { text: Menu_detectorSelector.cat[theLocale], value: 'zumiCatDetected'},
-                        ]
-                    },
+                btnPressed: {
+                    acceptReporters: false,
+                    items: [
+                        { text: Menu_btnPressed.pressed[theLocale], value: '0'},
+                        { text: Menu_btnPressed.notPressed[theLocale], value: '1'},
+                    ]
+                },
 
-                    colordetector: {
-                        acceptReporters: false,
-                        items: [
-                            { text: Menu_colordetector.red[theLocale], value: '0'},
-                            { text: Menu_colordetector.orange[theLocale], value: '1'},
-                            { text: Menu_colordetector.yellow[theLocale], value: '2'},
-                            { text: Menu_colordetector.green[theLocale], value: '3'},
-                            { text: Menu_colordetector.cyan[theLocale], value: '4'},
-                            { text: Menu_colordetector.blue[theLocale], value: '5'},
-                            { text: Menu_colordetector.purple[theLocale], value: '6'},
-                        ]
-                    },
+                faceDetector: {
+                    acceptReporters: false,
+                    items: [
+                        { text: Menu_detectorSelector.face[theLocale], value: 'zumiFaceDetected'},
+                        { text: Menu_detectorSelector.cat[theLocale], value: 'zumiCatDetected'},
+                    ]
+                },
 
-                    detectorSelector: {
-                        acceptReporters: false,
-                        items: [
-                            { text: Menu_detectorSelector.face[theLocale], value: 'REQUEST_ENTRY_FACE_DETECT'},
-                            { text: Menu_detectorSelector.cat[theLocale], value: 'REQUEST_ENTRY_CAT_DETECT'},
-                            { text: Menu_detectorSelector.color[theLocale], value: 'REQUEST_ENTRY_COLOR_DETECT'},
-                            { text: Menu_detectorSelector.marker[theLocale], value: 'REQUEST_ENTRY_APRIL_DETECT'},
-                        ]
-                    },
+                colordetector: {
+                    acceptReporters: false,
+                    items: [
+                        { text: Menu_colordetector.red[theLocale], value: '0'},
+                        { text: Menu_colordetector.orange[theLocale], value: '1'},
+                        { text: Menu_colordetector.yellow[theLocale], value: '2'},
+                        { text: Menu_colordetector.green[theLocale], value: '3'},
+                        { text: Menu_colordetector.cyan[theLocale], value: '4'},
+                        { text: Menu_colordetector.blue[theLocale], value: '5'},
+                        { text: Menu_colordetector.purple[theLocale], value: '6'},
+                    ]
+                },
 
-                    screenSelector: {
-                        acceptReporters: false,
-                        items: [
-                            { text: Menu_screenSelector.camera[theLocale], value: 'camera' },
-                            { text: Menu_screenSelector.emotion[theLocale], value: 'emotion' }
-                        ]
-                    },
+                detectorSelector: {
+                    acceptReporters: false,
+                    items: [
+                        { text: Menu_detectorSelector.face[theLocale], value: 'REQUEST_ENTRY_FACE_DETECT'},
+                        { text: Menu_detectorSelector.cat[theLocale], value: 'REQUEST_ENTRY_CAT_DETECT'},
+                        { text: Menu_detectorSelector.color[theLocale], value: 'REQUEST_ENTRY_COLOR_DETECT'},
+                        { text: Menu_detectorSelector.marker[theLocale], value: 'REQUEST_ENTRY_APRIL_DETECT'},
+                    ]
+                },
 
-                    soundSelector: {
-                        acceptReporters: false,
-                        items: [
-                            { text: Menu_soundSelector.catMeow[theLocale], value: '0' },
-                            { text: Menu_soundSelector.cameraShutter[theLocale], value: '1' },
-                            { text: Menu_soundSelector.fail1[theLocale], value: '2' },
-                            { text: Menu_soundSelector.fail2[theLocale], value: '3' },
-                            { text: Menu_soundSelector.horn1[theLocale], value: '4' },
-                            { text: Menu_soundSelector.horn2[theLocale], value: '5' },
-                            { text: Menu_soundSelector.siren[theLocale], value: '6' },
-                            { text: Menu_soundSelector.success[theLocale], value: '7' },
-                        ]
-                    },
+                screenSelector: {
+                    acceptReporters: false,
+                    items: [
+                        { text: Menu_screenSelector.camera[theLocale], value: 'camera' },
+                        { text: Menu_screenSelector.emotion[theLocale], value: 'emotion' }
+                    ]
+                },
 
-                    emotionSelector: {
-                        acceptReporters: false,
-                        items: [
-                            { text: Menu_emotionSelector.off[theLocale], value: '0' },
-                            { text: Menu_emotionSelector.stop[theLocale], value: '2' },
-                            { text: Menu_emotionSelector.blink[theLocale], value: '3' },
-                            { text: Menu_emotionSelector.smile[theLocale], value: '4' },
-                            { text: Menu_emotionSelector.love[theLocale], value: '5' },
-                            { text: Menu_emotionSelector.shock[theLocale], value: '6' },
-                            { text: Menu_emotionSelector.surprise[theLocale], value: '7' },
-                            { text: Menu_emotionSelector.joy[theLocale], value: '8' },
-                            { text: Menu_emotionSelector.anger[theLocale], value: '9' },
-                            { text: Menu_emotionSelector.sleepy[theLocale], value: '10' },
-                            { text: Menu_emotionSelector.sadness[theLocale], value: '11' },
-                            { text: Menu_emotionSelector.dizzy[theLocale], value: '12' },
-                            { text: Menu_emotionSelector.sleep[theLocale], value: '13' },
-                            { text: Menu_emotionSelector.wink[theLocale], value: '14' },
-                            { text: Menu_emotionSelector.detect[theLocale], value: '15' },
-                        ]
-                    },
+                soundSelector: {
+                    acceptReporters: false,
+                    items: [
+                        { text: Menu_soundSelector.catMeow[theLocale], value: '0' },
+                        { text: Menu_soundSelector.cameraShutter[theLocale], value: '1' },
+                        { text: Menu_soundSelector.fail1[theLocale], value: '2' },
+                        { text: Menu_soundSelector.fail2[theLocale], value: '3' },
+                        { text: Menu_soundSelector.horn1[theLocale], value: '4' },
+                        { text: Menu_soundSelector.horn2[theLocale], value: '5' },
+                        { text: Menu_soundSelector.siren[theLocale], value: '6' },
+                        { text: Menu_soundSelector.success[theLocale], value: '7' },
+                    ]
+                },
 
-                    ledPattern: {
-                        items: [
-                            { text: Menu_ledPattern.on[theLocale], value: '0' },
-                            { text: Menu_ledPattern.blink[theLocale], value: '1' },
-                            { text: Menu_ledPattern.doubleBlink[theLocale], value: '2' },
-                            { text: Menu_ledPattern.fadeInOut[theLocale], value: '3' },
-                            { text: Menu_ledPattern.fadeOut[theLocale], value: '4' },
-                            { text: Menu_ledPattern.fadeIn[theLocale], value: '5' },
-                            { text: Menu_ledPattern.rainbow[theLocale], value: '6' }
-                        ]
-                    },
+                emotionSelector: {
+                    acceptReporters: false,
+                    items: [
+                        { text: Menu_emotionSelector.off[theLocale], value: '0' },
+                        { text: Menu_emotionSelector.stop[theLocale], value: '2' },
+                        { text: Menu_emotionSelector.blink[theLocale], value: '3' },
+                        { text: Menu_emotionSelector.smile[theLocale], value: '4' },
+                        { text: Menu_emotionSelector.love[theLocale], value: '5' },
+                        { text: Menu_emotionSelector.shock[theLocale], value: '6' },
+                        { text: Menu_emotionSelector.surprise[theLocale], value: '7' },
+                        { text: Menu_emotionSelector.joy[theLocale], value: '8' },
+                        { text: Menu_emotionSelector.anger[theLocale], value: '9' },
+                        { text: Menu_emotionSelector.sleepy[theLocale], value: '10' },
+                        { text: Menu_emotionSelector.sadness[theLocale], value: '11' },
+                        { text: Menu_emotionSelector.dizzy[theLocale], value: '12' },
+                        { text: Menu_emotionSelector.sleep[theLocale], value: '13' },
+                        { text: Menu_emotionSelector.wink[theLocale], value: '14' },
+                        { text: Menu_emotionSelector.detect[theLocale], value: '15' },
+                    ]
+                },
 
-                    moveDirection: {
-                        items: [
-                            { text: Menu_moveDirection.forward[theLocale], value: '0' },
-                            { text: Menu_moveDirection.backward[theLocale], value: '1' }
-                        ]
-                    },
+                ledPattern: {
+                    items: [
+                        { text: Menu_ledPattern.on[theLocale], value: '0' },
+                        { text: Menu_ledPattern.blink[theLocale], value: '1' },
+                        { text: Menu_ledPattern.doubleBlink[theLocale], value: '2' },
+                        { text: Menu_ledPattern.fadeInOut[theLocale], value: '3' },
+                        { text: Menu_ledPattern.fadeOut[theLocale], value: '4' },
+                        { text: Menu_ledPattern.fadeIn[theLocale], value: '5' },
+                        { text: Menu_ledPattern.rainbow[theLocale], value: '6' }
+                    ]
+                },
 
-                    motorDirection: {
-                        acceptReporters: false,
-                        items: [
-                            { text: Menu_motorDirection.stop[theLocale], value: '0' },
-                            { text: Menu_motorDirection.forward[theLocale], value: '1' },
-                            { text: Menu_motorDirection.backward[theLocale], value: '2' },
-                        ]
-                    },
+                moveDirection: {
+                    items: [
+                        { text: Menu_moveDirection.forward[theLocale], value: '0' },
+                        { text: Menu_moveDirection.backward[theLocale], value: '1' }
+                    ]
+                },
 
-                    turnDirection: {
-                        acceptReporters: false,
-                        items: [
-                            { text: Menu_turnDirection.left[theLocale], value: '0' },
-                            { text: Menu_turnDirection.right[theLocale], value: '1' }
-                        ]
-                    },
+                motorDirection: {
+                    acceptReporters: false,
+                    items: [
+                        { text: Menu_motorDirection.stop[theLocale], value: '0' },
+                        { text: Menu_motorDirection.forward[theLocale], value: '1' },
+                        { text: Menu_motorDirection.backward[theLocale], value: '2' },
+                    ]
+                },
 
-                    moveSpeed: {
-                        acceptReporters: false,
-                        items: [
-                            { text: Menu_moveSpeed.slow[theLocale], value: '1' },
-                            { text: Menu_moveSpeed.normal[theLocale], value: '2' },
-                            { text: Menu_moveSpeed.fast[theLocale], value: '3' }
-                        ]
-                    },
+                turnDirection: {
+                    acceptReporters: false,
+                    items: [
+                        { text: Menu_turnDirection.left[theLocale], value: '0' },
+                        { text: Menu_turnDirection.right[theLocale], value: '1' }
+                    ]
+                },
 
-                    textColorSelector: {
-                        acceptReporters: false,
-                        items: [
-                            { text: Menu_textColorSelector.current[theLocale], value: '0' },
-                            { text: Menu_textColorSelector.white[theLocale], value: '1' },
-                            { text: Menu_textColorSelector.black[theLocale], value: '2' },
-                            { text: Menu_textColorSelector.navy[theLocale], value: '3' },
-                            { text: Menu_textColorSelector.blue[theLocale], value: '4' },
-                            { text: Menu_textColorSelector.skyBlue[theLocale], value: '5' },
-                            { text: Menu_textColorSelector.cyan[theLocale], value: '6' },
-                            { text: Menu_textColorSelector.teal[theLocale], value: '7' },
-                            { text: Menu_textColorSelector.green[theLocale], value: '8' },
-                            { text: Menu_textColorSelector.lightGreen[theLocale], value: '9' },
-                            { text: Menu_textColorSelector.lime[theLocale], value: '10' },
-                            { text: Menu_textColorSelector.yellow[theLocale], value: '11' },
-                            { text: Menu_textColorSelector.amber[theLocale], value: '12' },
-                            { text: Menu_textColorSelector.orange[theLocale], value: '13' },
-                            { text: Menu_textColorSelector.darkOrange[theLocale], value: '14' },
-                            { text: Menu_textColorSelector.brown[theLocale], value: '15' },
-                            { text: Menu_textColorSelector.blueGray[theLocale], value: '16' },
-                            { text: Menu_textColorSelector.gray[theLocale], value: '17' },
-                        ]
-                    },
+                moveSpeed: {
+                    acceptReporters: false,
+                    items: [
+                        { text: Menu_moveSpeed.slow[theLocale], value: '1' },
+                        { text: Menu_moveSpeed.normal[theLocale], value: '2' },
+                        { text: Menu_moveSpeed.fast[theLocale], value: '3' }
+                    ]
+                },
 
-                    textSizeSelector: {
-                        acceptReporters: false,
-                        items: [
-                            { text: Menu_textSizeSelector.current[theLocale], value: '0' },
-                            { text: Menu_textSizeSelector.size1[theLocale], value: '1' },
-                            { text: Menu_textSizeSelector.size2[theLocale], value: '2' },
-                            { text: Menu_textSizeSelector.size3[theLocale], value: '3' },
-                            { text: Menu_textSizeSelector.size4[theLocale], value: '4' },
-                            { text: Menu_textSizeSelector.size5[theLocale], value: '5' },
-                        ]
-                    },
+                textColorSelector: {
+                    acceptReporters: false,
+                    items: [
+                        { text: Menu_textColorSelector.current[theLocale], value: '0' },
+                        { text: Menu_textColorSelector.white[theLocale], value: '1' },
+                        { text: Menu_textColorSelector.black[theLocale], value: '2' },
+                        { text: Menu_textColorSelector.navy[theLocale], value: '3' },
+                        { text: Menu_textColorSelector.blue[theLocale], value: '4' },
+                        { text: Menu_textColorSelector.skyBlue[theLocale], value: '5' },
+                        { text: Menu_textColorSelector.cyan[theLocale], value: '6' },
+                        { text: Menu_textColorSelector.teal[theLocale], value: '7' },
+                        { text: Menu_textColorSelector.green[theLocale], value: '8' },
+                        { text: Menu_textColorSelector.lightGreen[theLocale], value: '9' },
+                        { text: Menu_textColorSelector.lime[theLocale], value: '10' },
+                        { text: Menu_textColorSelector.yellow[theLocale], value: '11' },
+                        { text: Menu_textColorSelector.amber[theLocale], value: '12' },
+                        { text: Menu_textColorSelector.orange[theLocale], value: '13' },
+                        { text: Menu_textColorSelector.darkOrange[theLocale], value: '14' },
+                        { text: Menu_textColorSelector.brown[theLocale], value: '15' },
+                        { text: Menu_textColorSelector.blueGray[theLocale], value: '16' },
+                        { text: Menu_textColorSelector.gray[theLocale], value: '17' },
+                    ]
+                },
 
-                    irSensorSelector: {
-                        acceptReporters: false,
-                        items: [
-                            { text: Menu_irSensorSelector.frontRight[theLocale], value: 'senFR' },
-                            { text: Menu_irSensorSelector.frontLeft[theLocale], value: 'senFL' },
-                            { text: Menu_irSensorSelector.bottomRight[theLocale], value: 'senBR' },
-                            { text: Menu_irSensorSelector.bottomLeft[theLocale], value: 'senBL' },
-                            { text: Menu_irSensorSelector.bottomCenter[theLocale], value: 'senBC' }
-                        ]
-                    },
+                textSizeSelector: {
+                    acceptReporters: false,
+                    items: [
+                        { text: Menu_textSizeSelector.current[theLocale], value: '0' },
+                        { text: Menu_textSizeSelector.size1[theLocale], value: '1' },
+                        { text: Menu_textSizeSelector.size2[theLocale], value: '2' },
+                        { text: Menu_textSizeSelector.size3[theLocale], value: '3' },
+                        { text: Menu_textSizeSelector.size4[theLocale], value: '4' },
+                        { text: Menu_textSizeSelector.size5[theLocale], value: '5' },
+                    ]
+                },
+
+                irSensorSelector: {
+                    acceptReporters: false,
+                    items: [
+                        { text: Menu_irSensorSelector.frontRight[theLocale], value: 'senFR' },
+                        { text: Menu_irSensorSelector.frontLeft[theLocale], value: 'senFL' },
+                        { text: Menu_irSensorSelector.bottomRight[theLocale], value: 'senBR' },
+                        { text: Menu_irSensorSelector.bottomLeft[theLocale], value: 'senBL' },
+                        { text: Menu_irSensorSelector.bottomCenter[theLocale], value: 'senBC' }
+                    ]
+                },
 
 
-                    catFaceSelector: {
-                        acceptReporters: false,
-                        items: [
-                            { text: Menu_catFaceSelector.state[theLocale], value: 'zumiCatDetected' },
-                            { text: Menu_catFaceSelector.xCoord[theLocale], value: 'zumiCatCenter[0]' },
-                            { text: Menu_catFaceSelector.yCoord[theLocale], value: 'zumiCatCenter[1]' },
-                        ]
-                    },
-                    humanFaceSelector: {
-                        acceptReporters: false,
-                        items: [
-                            { text: Menu_humanFaceSelector.state[theLocale], value: 'zumiFaceDetected' },
-                            { text: Menu_humanFaceSelector.xCoord[theLocale], value: 'zumiFaceCenter[0]' },
-                            { text: Menu_humanFaceSelector.yCoord[theLocale], value: 'zumiFaceCenter[1]' },
-                        ]
-                    },
+                catFaceSelector: {
+                    acceptReporters: false,
+                    items: [
+                        { text: Menu_catFaceSelector.state[theLocale], value: 'zumiCatDetected' },
+                        { text: Menu_catFaceSelector.xCoord[theLocale], value: 'zumiCatCenter[0]' },
+                        { text: Menu_catFaceSelector.yCoord[theLocale], value: 'zumiCatCenter[1]' },
+                    ]
+                },
+                humanFaceSelector: {
+                    acceptReporters: false,
+                    items: [
+                        { text: Menu_humanFaceSelector.state[theLocale], value: 'zumiFaceDetected' },
+                        { text: Menu_humanFaceSelector.xCoord[theLocale], value: 'zumiFaceCenter[0]' },
+                        { text: Menu_humanFaceSelector.yCoord[theLocale], value: 'zumiFaceCenter[1]' },
+                    ]
+                },
 
-                    markerSelector: {
-                        acceptReporters: false,
-                        items: [
-                            { text: Menu_markerSelector.id[theLocale], value: 'zumiMarkerDetected' },
-                            { text: Menu_markerSelector.xCoord[theLocale], value: 'zumiMarkerCenter[0]' },
-                            { text: Menu_markerSelector.yCoord[theLocale], value: 'zumiMarkerCenter[1]' },
-                        ]
-                    },
+                markerSelector: {
+                    acceptReporters: false,
+                    items: [
+                        { text: Menu_markerSelector.id[theLocale], value: 'zumiMarkerDetected' },
+                        { text: Menu_markerSelector.xCoord[theLocale], value: 'zumiMarkerCenter[0]' },
+                        { text: Menu_markerSelector.yCoord[theLocale], value: 'zumiMarkerCenter[1]' },
+                    ]
+                },
 
-                    colorSelector: {
-                        acceptReporters: false,
-                        items: [
-                            { text: Menu_colorSelector.color[theLocale], value: 'zumiColorDetected' },
-                            { text: Menu_colorSelector.xCoord[theLocale], value: 'zumiColorCenter[0]' },
-                            { text: Menu_colorSelector.yCoord[theLocale], value: 'zumiColorCenter[1]' },
-                        ]
-                    },
-                }
-            };
+                colorSelector: {
+                    acceptReporters: false,
+                    items: [
+                        { text: Menu_colorSelector.color[theLocale], value: 'zumiColorDetected' },
+                        { text: Menu_colorSelector.xCoord[theLocale], value: 'zumiColorCenter[0]' },
+                        { text: Menu_colorSelector.yCoord[theLocale], value: 'zumiColorCenter[1]' },
+                    ]
+                },
+            }
         }
-
+    }
 
 
     // ===============================================
@@ -1364,15 +1398,19 @@ class Scratch3Esp32Serial {
     // ===============================================
 
         groupConnect(args){
-            this._openConfig();
+            //this._openConfig();
+        }
 
-// // this.runtime.emit('SHOW_ALERT', {
-// //     message: 'Zumi AI 연결이 완료되었습니다!',
-// // });
-// this.runtime.emit('SHOW_EXTENSION_MODAL', {
-// title: 'Zumi AI 설정',
-// content: '여기에 설정 정보를 입력하세요',
-// });
+        connectPort(args){
+            this.connectDevice();
+        }
+
+        disconnectPort(args){
+            this.disconnectDevice();
+        }
+
+        getConnectState(){
+            return this.isConnected();
         }
 
         groupLED(args){
@@ -1392,6 +1430,7 @@ class Scratch3Esp32Serial {
 
         groupAI(args){
         }
+
 
     // ===============================================
     // 개별 블록 함수 (LED)
@@ -2318,649 +2357,680 @@ class Scratch3Esp32Serial {
     }
 
 
-    // ===============================================
-    // 데이터 수신
-    // ===============================================
 
-    /**
-     * 연결 타임아웃 타이머를 시작/재설정하고, 타임아웃 발생 시 연결 상태를 false로 변경합니다.
-     */
-    _resetConnectionTimeout() {
-        // 1. 기존 타이머가 있다면 취소합니다. (이전 패킷 수신이 성공했으므로)
-        if (this.connectionTimeoutHandler) {
-            clearTimeout(this.connectionTimeoutHandler);
-        }
 
-        // 2. 새로운 타이머를 설정합니다. 지정된 시간 내에 다음 패킷이 오지 않으면 실행됩니다.
-        this.connectionTimeoutHandler = setTimeout(() => {
-            // 타임아웃 발생!
-            if (this.connectState === true) {
-                this.connectState = false; // 연결 상태를 끊김(false)으로 변경
+
+
+        // ===============================================
+        // 데이터 수신
+        // ===============================================
+
+        /**
+         * 연결 타임아웃 타이머를 시작/재설정하고, 타임아웃 발생 시 연결 상태를 false로 변경합니다.
+         */
+        _resetConnectionTimeout() {
+            // 1. 기존 타이머가 있다면 취소합니다. (이전 패킷 수신이 성공했으므로)
+            if (this.connectionTimeoutHandler) {
+                clearTimeout(this.connectionTimeoutHandler);
             }
-        }, this.CONNECTION_TIMEOUT_MS);
-    }
 
-    /**
-     * 데이터 저장소 업데이트
-     */
-    _updateDataStore(dataArray) {
-
-        const offset = this.HEADER_LENGTH;
-
-        // 1. 상태 플래그 업데이트
-        this.reqINFO = dataArray[PacketIndex.DATA_INFO - offset];
-        this.reqREQ = dataArray[PacketIndex.DATA_REQ - offset];
-        this.reqPSTAT = dataArray[PacketIndex.DATA_PSTAT - offset];
-        this.btn = dataArray[PacketIndex.DATA_BTN_INPUT - offset];
-        this.battery = dataArray[PacketIndex.DATA_BATTERY - offset];
-
-        // 2. IR 센서 업데이트
-        this.senFR = dataArray[PacketIndex.DATA_SEN_FR - offset];
-        this.senFL = dataArray[PacketIndex.DATA_SEN_FL - offset];
-        this.senBR = dataArray[PacketIndex.DATA_SEN_BR - offset];
-        this.senBC = dataArray[PacketIndex.DATA_SEN_BC - offset];
-        this.senBL = dataArray[PacketIndex.DATA_SEN_BL - offset];
-
-        // 3. 객체 감지 데이터 업데이트 (Boolean과 좌표)
-        // 얼굴
-        this.zumiFaceDetected = dataArray[PacketIndex.DATA_DETECT_FACE - offset] === 1;
-        this.zumiFaceCenter[0] = dataArray[PacketIndex.DATA_DETECT_FACE_X - offset];
-        this.zumiFaceCenter[1] = dataArray[PacketIndex.DATA_DETECT_FACE_Y - offset];
-
-        // 색상
-        this.zumiColorDetected = dataArray[PacketIndex.DATA_DETECT_COLOR - offset];
-        this.zumiColorCenter[0] = dataArray[PacketIndex.DATA_DETECT_COLOR_X - offset];
-        this.zumiColorCenter[1] = dataArray[PacketIndex.DATA_DETECT_COLOR_Y - offset];
-
-        // 마커
-        this.zumiMarkerDetected = dataArray[PacketIndex.DATA_DETECT_MARKER - offset];
-        this.zumiMarkerCenter[0] = dataArray[PacketIndex.DATA_DETECT_MARKER_X - offset];
-        this.zumiMarkerCenter[1] = dataArray[PacketIndex.DATA_DETECT_MARKER_Y - offset];
-
-        // 고양이
-        this.zumiCatDetected = dataArray[PacketIndex.DATA_DETECT_CAT - offset] === 1;
-        this.zumiCatCenter[0] = dataArray[PacketIndex.DATA_DETECT_CAT_X - offset];
-        this.zumiCatCenter[1] = dataArray[PacketIndex.DATA_DETECT_CAT_Y - offset];
-
-        //console.log(this.zumiMarkerDetected);
-    }
-
-    /**
-     * 시리얼 포트로부터 데이터 읽기 (비동기 리스너)
-     */
-    _processReceiverByte(data) {
-        // 1. Failure 상태 초기화
-        if (this.receiverState === this.StateLoading.Failure) {
-            this.receiverState = this.StateLoading.Ready;
+            // 2. 새로운 타이머를 설정합니다. 지정된 시간 내에 다음 패킷이 오지 않으면 실행됩니다.
+            this.connectionTimeoutHandler = setTimeout(() => {
+                // 타임아웃 발생!
+                if (this.connectState === true) {
+                    this.connectState = false; // 연결 상태를 끊김(false)으로 변경
+                }
+            }, this.CONNECTION_TIMEOUT_MS);
         }
 
-        // 2. Ready 상태: 초기화 및 Start 섹션 진입
-        if (this.receiverState === this.StateLoading.Ready) {
-            this.receiverSection = this.Section.Start;
-            this.receiverIndex = 0;
+        /**
+         * 데이터 저장소 업데이트
+         */
+        _updateDataStore(dataArray) {
+
+            const offset = this.HEADER_LENGTH;
+
+            // 1. 상태 플래그 업데이트
+            this.reqINFO = dataArray[PacketIndex.DATA_INFO - offset];
+            this.reqREQ = dataArray[PacketIndex.DATA_REQ - offset];
+            this.reqPSTAT = dataArray[PacketIndex.DATA_PSTAT - offset];
+            this.btn = dataArray[PacketIndex.DATA_BTN_INPUT - offset];
+            this.battery = dataArray[PacketIndex.DATA_BATTERY - offset];
+
+            // 2. IR 센서 업데이트
+            this.senFR = dataArray[PacketIndex.DATA_SEN_FR - offset];
+            this.senFL = dataArray[PacketIndex.DATA_SEN_FL - offset];
+            this.senBR = dataArray[PacketIndex.DATA_SEN_BR - offset];
+            this.senBC = dataArray[PacketIndex.DATA_SEN_BC - offset];
+            this.senBL = dataArray[PacketIndex.DATA_SEN_BL - offset];
+
+            // 3. 객체 감지 데이터 업데이트 (Boolean과 좌표)
+            // 얼굴
+            this.zumiFaceDetected = dataArray[PacketIndex.DATA_DETECT_FACE - offset] === 1;
+            this.zumiFaceCenter[0] = dataArray[PacketIndex.DATA_DETECT_FACE_X - offset];
+            this.zumiFaceCenter[1] = dataArray[PacketIndex.DATA_DETECT_FACE_Y - offset];
+
+            // 색상
+            this.zumiColorDetected = dataArray[PacketIndex.DATA_DETECT_COLOR - offset];
+            this.zumiColorCenter[0] = dataArray[PacketIndex.DATA_DETECT_COLOR_X - offset];
+            this.zumiColorCenter[1] = dataArray[PacketIndex.DATA_DETECT_COLOR_Y - offset];
+
+            // 마커
+            this.zumiMarkerDetected = dataArray[PacketIndex.DATA_DETECT_MARKER - offset];
+            this.zumiMarkerCenter[0] = dataArray[PacketIndex.DATA_DETECT_MARKER_X - offset];
+            this.zumiMarkerCenter[1] = dataArray[PacketIndex.DATA_DETECT_MARKER_Y - offset];
+
+            // 고양이
+            this.zumiCatDetected = dataArray[PacketIndex.DATA_DETECT_CAT - offset] === 1;
+            this.zumiCatCenter[0] = dataArray[PacketIndex.DATA_DETECT_CAT_X - offset];
+            this.zumiCatCenter[1] = dataArray[PacketIndex.DATA_DETECT_CAT_Y - offset];
+
+            //console.log(this.zumiMarkerDetected);
         }
 
-        else if (this.receiverState === this.StateLoading.Loaded){
+        /**
+         * 시리얼 포트로부터 데이터 읽기 (비동기 리스너)
+         */
+        _processReceiverByte(data) {
+            // 1. Failure 상태 초기화
+            if (this.receiverState === this.StateLoading.Failure) {
+                this.receiverState = this.StateLoading.Ready;
+            }
+
+            // 2. Ready 상태: 초기화 및 Start 섹션 진입
+            if (this.receiverState === this.StateLoading.Ready) {
+                this.receiverSection = this.Section.Start;
+                this.receiverIndex = 0;
+            }
+
+            else if (this.receiverState === this.StateLoading.Loaded){
+                return this.receiverState;
+            }
+
+            // 3. section check
+            if (this.receiverSection !== this.receiverSectionOld) {
+                this.receiverIndex = 0;
+                this.receiverSectionOld = this.receiverSection;
+            }
+
+            // 4. Section.Start: 헤더 확인
+            if (this.receiverSection === this.Section.Start) {
+                if (this.receiverIndex === 0) {
+                    if (data === this.PACKET_START_BYTE1) { // 0x24 ($)
+                        this.receiverState = this.StateLoading.Receiving;
+                    } else {
+                        this.receiverState = this.StateLoading.Failure;
+                       // this.receiverMessage = "Error: Invalid Start Byte 1";
+                      //  console.log(receiverMessage);
+                        return this.receiverState;
+                    }
+                } else if (this.receiverIndex === 1) {
+                    if (data === this.PACKET_START_BYTE2) { // 0x52 (R)
+                        this.receiverSection = this.Section.Data; // 데이터 섹션으로 이동
+                        this.receiverBuffer = []; // 데이터 저장 버퍼 초기화
+                    } else {
+                        this.receiverState = this.StateLoading.Failure;
+                       // this.receiverMessage = "Error: Invalid Start Byte 2";
+                       // console.log(receiverMessage);
+                        return this.receiverState;
+                    }
+                }
+            }
+
+            // 5. Section.Data: 데이터 본문 수집
+            else if (this.receiverSection === this.Section.Data) {
+                this.receiverBuffer.push(data);
+                if (this.receiverIndex === (this.PACKET_DATA_LENGTH - 1)) {
+                    this.receiverSection = this.Section.End; // End 섹션으로 이동
+                }
+            }
+
+            // 6. Section.End: 패킷 완료 (파이썬 코드에서 CRC/꼬리가 생략된 것으로 추정)
+            else if (this.receiverSection === this.Section.End) {
+
+                if (this.receiverIndex === 1) {
+                    this.receiverData = [...this.receiverBuffer]; // 최종 데이터 복사
+                    this.receiverState = this.StateLoading.Loaded;
+                   // this.receiverMessage = "Success: Receive complete";
+
+                    // =======================================================
+                    // 수신 완료 시 연결 상태 설정 및 타이머 재설정
+                    this.connectState = true;
+                    this._resetConnectionTimeout(); // 다음 패킷을 기다리는 타이머 시작!
+                    // =======================================================
+
+                    return this.receiverState;
+                }
+            }
+
+            // 6. 인덱스 증가 (Receiving 상태일 때만)
+            if (this.receiverState === this.StateLoading.Receiving) {
+                this.receiverIndex++;
+            }
+
             return this.receiverState;
         }
 
-        // 3. section check
-        if (this.receiverSection !== this.receiverSectionOld) {
+        // Receiver 상태를 초기화하는 보조 함수
+        _resetReceiverState() {
+            this.receiverState = this.StateLoading.Ready;
+            this.receiverSection = this.Section.Start;
             this.receiverIndex = 0;
-            this.receiverSectionOld = this.receiverSection;
+            this.receiverBuffer = []; // 수신 버퍼 클리어
+          //  this.receiverMessage = null;
         }
 
-        // 4. Section.Start: 헤더 확인
-        if (this.receiverSection === this.Section.Start) {
-            if (this.receiverIndex === 0) {
-                if (data === this.PACKET_START_BYTE1) { // 0x24 ($)
-                    this.receiverState = this.StateLoading.Receiving;
-                } else {
-                    this.receiverState = this.StateLoading.Failure;
-                    this.receiverMessage = "Error: Invalid Start Byte 1";
-                    console.log(receiverMessage);
-                    return this.receiverState;
+
+    /**
+     * 웹 시리얼 포트에서 수신된 원시 데이터(Uint8Array)를 처리하고
+     * 패킷을 재조립하여 데이터 저장소를 업데이트합니다.
+     * * @param {Uint8Array} data - 시리얼 포트에서 읽은 원시 바이트 데이터.
+     */
+        processRawData(data) {
+            // 1. 수신된 원시 데이터를 내부 버퍼에 추가합니다.
+            // this.bufferHandler는 bytearray (Uint8Array)와 유사한 역할입니다.
+            // 여기서는 간단히 배열로 처리하겠습니다.
+            if (!this.bufferHandler) {
+                this.bufferHandler = []; // 초기화
+            }
+
+            // Uint8Array의 각 요소를 일반 배열에 추가
+            for (const byte of data) {
+                this.bufferHandler.push(byte);
+            }
+
+            // 2. 버퍼에 데이터가 남아있는 한, 바이트 단위로 Receiver 로직을 수행합니다.
+            while (this.bufferHandler.length > 0) {
+                // 버퍼의 첫 번째 바이트를 꺼내서 처리합니다. (파이썬의 pop(0)과 유사)
+                const byte = this.bufferHandler.shift();
+
+                // **3. Receiver 로직 (State Machine) 실행**
+                const stateLoading = this._processReceiverByte(byte);
+
+                // 4. 패킷 완료 확인 및 처리
+                if (stateLoading === this.StateLoading.Loaded) {
+
+                    this._updateDataStore(this.receiverData);
+
+                    // Receiver 상태 초기화 (다음 패킷을 받을 준비)
+                    this._resetReceiverState();
+
+                    //console.log("Packet received and data store updated.");
+
+                    // 루프를 다시 시작하여 버퍼에 남아있는 데이터가 있는지 확인합니다.
+                    continue;
                 }
-            } else if (this.receiverIndex === 1) {
-                if (data === this.PACKET_START_BYTE2) { // 0x52 (R)
-                    this.receiverSection = this.Section.Data; // 데이터 섹션으로 이동
-                    this.receiverBuffer = []; // 데이터 저장 버퍼 초기화
-                } else {
-                    this.receiverState = this.StateLoading.Failure;
-                    this.receiverMessage = "Error: Invalid Start Byte 2";
-                    console.log(receiverMessage);
-                    return this.receiverState;
+                // 5. 오류 처리 (파이썬의 StateLoading.Failure)
+                if (stateLoading === this.StateLoading.Failure) {
+                    // console.error("Receiver Error:", this.receiverMessage);
+                    // Receiver 상태 초기화
+                    this._resetReceiverState();
+                    // 버퍼에 남아있는 데이터는 다음 패킷의 시작일 수 있으므로 버퍼를 비우지 않습니다.
                 }
             }
         }
 
-        // 5. Section.Data: 데이터 본문 수집
-        else if (this.receiverSection === this.Section.Data) {
-            this.receiverBuffer.push(data);
-            if (this.receiverIndex === (this.PACKET_DATA_LENGTH - 1)) {
-                this.receiverSection = this.Section.End; // End 섹션으로 이동
+        // async readSerial() {
+        //     if (!this.serialPort || !this.serialPort.readable) return;
+        //     this.reader = this.serialPort.readable.getReader();
+        //     while (true) {
+        //         try {
+        //             const { value, done } = await this.reader.read();
+        //             if (done) break;
+        //             this.processRawData(value); // Receiver 역할 수행
+        //         } catch (error) {
+        //             // 포트가 닫힌 경우 등
+        //             break;
+        //         }
+        //     }
+        // }
+
+        // -----------------------------------------------------
+        // [추가된 부분] Notify 관련 로직
+        // -----------------------------------------------------
+
+        /**
+         * Characteristic 값이 변경될 때마다 호출되는 리스너 함수.
+         * @param {Event} event
+         */
+        handleCharacteristicValueChanged(event) {
+            const value = event.target.value; // DataView 객체
+
+            // DataView를 Uint8Array로 변환
+            const byteArray = new Uint8Array(value.buffer);
+
+            // 수신된 데이터를 콘솔에 출력하여 확인합니다.
+            //console.log('--- BLE NOTIFY RECEIVED ---');
+            //console.log('Raw Data (Uint8Array):', byteArray);
+
+            this.processRawData(byteArray); // Receiver 역할 수행
+
+            // // 텍스트로 변환하여 출력 (옵션)
+            // try {
+            //     const textDecoder = new TextDecoder('utf-8');
+            //     const textValue = textDecoder.decode(value.buffer);
+            //     console.log('Text Value:', textValue);
+            // } catch (e) {
+            //     console.warn('Received data is not valid UTF-8 text.', e);
+            // }
+
+            // Scratch 런타임에 이벤트를 발생시켜 스크래치 블록에서 데이터를 사용할 수 있게 할 수 있습니다.
+            // 예: this.runtime.emit('ZUMI_DATA_RECEIVED', byteArray);
+           // console.log('-----------------------------');
+        }
+
+        // ===============================================
+        // 데이터 전송
+        // ===============================================
+
+        // 커맨드와 파라미터 형태 구성
+        async sendCommand(commandType, ...params) {
+
+            const commandName = Object.keys(CommandType).find(key => CommandType[key] === commandType);
+            if (!commandName) {
+                console.error(`Unknown commandType: ${commandType}`);
+                return;
             }
-        }
 
-        // 6. Section.End: 패킷 완료 (파이썬 코드에서 CRC/꼬리가 생략된 것으로 추정)
-        else if (this.receiverSection === this.Section.End) {
+            // 1. 데이터 본문 구성 (파이썬 Command_variable_byte.toArray()의 일부)
+            const paramLength = CommandType_DATA_LENGTH[commandName] || 0;
+            // 커맨드 바이트(1) + 파라미터(N)
+            const payloadBytes = new Uint8Array(1 + paramLength);
 
-            if (this.receiverIndex === 1) {
-                this.receiverData = [...this.receiverBuffer]; // 최종 데이터 복사
-                this.receiverState = this.StateLoading.Loaded;
-                this.receiverMessage = "Success: Receive complete";
+            payloadBytes[0] = commandType;
 
-                // =======================================================
-                // 수신 완료 시 연결 상태 설정 및 타이머 재설정
-                this.connectState = true;
-                this._resetConnectionTimeout(); // 다음 패킷을 기다리는 타이머 시작!
-                // =======================================================
-
-                return this.receiverState;
+            for (let i = 0; i < params.length && i < paramLength; i++) {
+                // 파라미터는 1바이트 크기로 전송
+                payloadBytes[i + 1] = params[i] & 0xFF;
             }
-        }
 
-        // 6. 인덱스 증가 (Receiving 상태일 때만)
-        if (this.receiverState === this.StateLoading.Receiving) {
-            this.receiverIndex++;
-        }
-
-        return this.receiverState;
-    }
-
-    // Receiver 상태를 초기화하는 보조 함수
-    _resetReceiverState() {
-        this.receiverState = this.StateLoading.Ready;
-        this.receiverSection = this.Section.Start;
-        this.receiverIndex = 0;
-        this.receiverBuffer = []; // 수신 버퍼 클리어
-        this.receiverMessage = null;
-    }
-
-
-/**
- * 웹 시리얼 포트에서 수신된 원시 데이터(Uint8Array)를 처리하고
- * 패킷을 재조립하여 데이터 저장소를 업데이트합니다.
- * * @param {Uint8Array} data - 시리얼 포트에서 읽은 원시 바이트 데이터.
- */
-    processRawData(data) {
-        // 1. 수신된 원시 데이터를 내부 버퍼에 추가합니다.
-        // this.bufferHandler는 bytearray (Uint8Array)와 유사한 역할입니다.
-        // 여기서는 간단히 배열로 처리하겠습니다.
-        if (!this.bufferHandler) {
-            this.bufferHandler = []; // 초기화
-        }
-
-        // Uint8Array의 각 요소를 일반 배열에 추가
-        for (const byte of data) {
-            this.bufferHandler.push(byte);
-        }
-
-        // 2. 버퍼에 데이터가 남아있는 한, 바이트 단위로 Receiver 로직을 수행합니다.
-        while (this.bufferHandler.length > 0) {
-            // 버퍼의 첫 번째 바이트를 꺼내서 처리합니다. (파이썬의 pop(0)과 유사)
-            const byte = this.bufferHandler.shift();
-
-            // **3. Receiver 로직 (State Machine) 실행**
-            const stateLoading = this._processReceiverByte(byte);
-
-            // 4. 패킷 완료 확인 및 처리
-            if (stateLoading === this.StateLoading.Loaded) {
-
-                this._updateDataStore(this.receiverData);
-
-                // Receiver 상태 초기화 (다음 패킷을 받을 준비)
-                this._resetReceiverState();
-
-                //console.log("Packet received and data store updated.");
-
-                // 루프를 다시 시작하여 버퍼에 남아있는 데이터가 있는지 확인합니다.
-                continue;
+            if((commandType == CommandType.COMMAND_MOTOR1_INFINITE) || (commandType== CommandType.COMMAND_MOTOR2_INFINITE))
+            {
+                this.motorTrigger = true;
             }
-            // 5. 오류 처리 (파이썬의 StateLoading.Failure)
-            if (stateLoading === this.StateLoading.Failure) {
-                // console.error("Receiver Error:", this.receiverMessage);
-                // Receiver 상태 초기화
-                this._resetReceiverState();
-                // 버퍼에 남아있는 데이터는 다음 패킷의 시작일 수 있으므로 버퍼를 비우지 않습니다.
+            else
+            {
+                this.motorTrigger = false;
             }
+
+            // 전송 데이터 패킷 구성
+            await this.makePacket(payloadBytes);
         }
-    }
 
-    async readSerial() {
-        if (!this.serialPort || !this.serialPort.readable) return;
+        // 실제 보낼 데이터 패킷 구성
+        async makePacket(payloadBytes) {
 
-        this.reader = this.serialPort.readable.getReader();
+            // 전체 전송 데이터 배열 구성 (파이썬 makeTransferDataArray 역할)
+            const HEADER1 = 0x24; // '$'
+            const HEADER2 = 0x52; // 'R'
 
-        while (true) {
+            // 전체 메시지 길이: 헤더(2) + 커맨드(1) + 리퀘스트(1) + 파라미터(paramLength)
+            const fullMessageLength = 4 + payloadBytes.length-1;
+
+            const dataArray = new Uint8Array(fullMessageLength);
+            let index = 0;
+
+            // 헤더 ($R)
+            dataArray[index++] = HEADER1;
+            dataArray[index++] = HEADER2;
+
+            // 커맨드 바이트
+            dataArray[index++] = payloadBytes[0];
+
+            // 리퀘스트 바이트
+            dataArray[index++] = this._current_request;
+
+            // 파라미터 데이터
+            // payloadBytes.slice(1)은 commandType을 제외한 파라미터들만 포함 (파이썬 data[1:]에 해당)
+            dataArray.set(payloadBytes.slice(1), index);
+
+
+            // 새로운 명령으로 단일 버퍼를 덮어씁니다.
+            this.nextCommandPayload = dataArray;
+        }
+
+        // 실제 데이터 전송
+        async transferData(dataArray) {
+
+            if (this.device == null) {
+                console.warn("bluetooth not ready. Cannot transfer.");
+                return;
+            }
+
+            this.isSending = true; // 전송 시작 플래그 ON
             try {
-                const { value, done } = await this.reader.read();
-                if (done) break;
+                // 명령을 보낼 때마다 새로운 writer 객체를 획득 (락 획득)
+               // writer = this.serialPort.writable.getWriter();
 
-                this.processRawData(value); // Receiver 역할 수행
+                // 쓰기 작업
+                //await writer.write(dataArray);
+                await this.characteristic.writeValue(dataArray);
+            } catch (error) {
+                // 락 획득 또는 쓰기 작업 중 오류 발생 시
+                console.error("bluetooth Write Error:", error);
+
+            } finally {
+                // 오류 여부와 관계없이 락 해제
+                // if (writer) {
+                //     writer.releaseLock();
+                // }
+                this.isSending = false; // 전송 완료/실패 후 플래그 OFF
+            }
+        }
+
+        // 루프 시작 함수 (connectPort 성공 시 호출)
+        startSendingLoop() {
+            if (this.isLoopRunning) return;
+            this.isLoopRunning = true;
+            console.log("Starting " + this.sendingLoopTime + "ms sending loop...");
+
+            // 첫 호출 시 바로 실행하고, 재귀적으로 setTimeout을 사용하여 주기를 제어
+            this.sendingLoop();
+        }
+
+        // sendingLoopTime 시간마다 실행될 실제 루프
+        async sendingLoop() {
+            const startTime = Date.now();
+            // 1. 현재 전송 중이 아니라면, 데이터를 보낼지 결정
+            if (!this.isSending && this.device != null) {
+                let dataToSend;
+
+                if (this.nextCommandPayload) {
+                    // 2. 보낼 데이터가 있다면 큐에서 꺼냄 (명령 데이터)
+                    dataToSend = this.nextCommandPayload;
+                    this.nextCommandPayload = null; // 사용했으므로 버퍼 비우기
+
+                    await this.transferData(dataToSend);
+
+                }
+                else if (this.motorTrigger == true){
+                    // 모터가 작동중인 경우, 모터를 멈추지 않도록 보냄
+                    const sendACK= new Uint8Array([
+                        0x24,
+                        0x52,
+                        CommandType.COMMAND_MOTOR1_INFINITE,
+                        this._current_request,
+                        this.tSpd1,
+                        this.tSpd2,
+                        this.tDir
+                    ]);
+
+                    await this.transferData(sendACK); // 디버그 시 정지
+
+                }
+                else {
+                    // 3. 보낼 데이터가 없다면 기본 ACK/유지 명령을 보냄 (50ms 주기 유지)
+                    // ACK/Heartbeat 명령의 payloadBytes를 여기에 직접 만듭니다.
+                    // (예: COMMAND_WAIT를 0바이트로 전송하거나, 별도의 ACK 커맨드를 정의해야 함)
+                    // 임시: COMMAND_GOGO (파라미터 0개)를 ACK처럼 사용
+                    // const commandType = CommandType.COMMAND_NONE;
+                    // dataToSend = new Uint8Array([commandType]);
+
+                //  const sendACK= [0x24,0x52,0x00,this._current_request,0x00,0x00,0x00,0x00,0x00,0xFF,0xFF]; //stop
+                    // 올바른 Uint8Array 형식으로 변경
+                    const sendACK = new Uint8Array([
+                        0x24, // HEADER1 '$'
+                        0x52, // HEADER2 'R'
+                        0x00, // COMMAND_TYPE (예: ACK/NOP)
+                        this._current_request,
+                        0x00, 0x00, 0x00, 0x00, 0x00, // 파라미터 및 기타 데이터
+                        0xFF, 0xFF // 아마도 패킷 끝/체크섬 등
+                    ]);
+
+                    await this.transferData(sendACK); // 디버그 시 정지
+                }
+
+                // 데이터 전송 실행 (비동기로 실행되나, 다음 루프를 막지는 않음)
+                // transferData를 사용하여 락 획득/해제는 내부에서 처리
+            }
+
+            // 2. 남은 시간 계산 후 다음 루프 예약
+            const elapsedTime = Date.now() - startTime;
+            // 주기를 유지하도록 딜레이를 계산합니다.
+            const delay = Math.max(0, this.sendingLoopTime - elapsedTime);
+
+            // ⭐️ setTimeout을 사용하여 다음 루프 실행을 예약합니다.
+            if (this.isLoopRunning) {
+                setTimeout(() => {
+                    this.sendingLoop(); // 자기 자신을 다시 호출하여 루프를 지속
+                }, delay);
+            }
+        }
+
+
+
+
+
+        // ===============================================
+        // 블루투스 연결 및 설정
+        // ===============================================
+
+        /**
+         * [Zumi BLE 장치 연결] 블록의 실제 로직.
+         * Web Bluetooth API를 사용하여 장치를 검색하고 연결합니다.
+         * @returns {Promise<void>} 비동기 작업 결과
+         */
+        async connectDevice() {
+            // 이미 연결되어 있다면 재시도하지 않습니다.
+            if (this.device && this.device.gatt.connected) {
+                console.log("이미 연결되어 있습니다.");
+                return;
+            }
+
+
+            if (!navigator.bluetooth) {
+                // [수정된 부분] Web Bluetooth 미지원 시 명확한 메시지 출력
+                const errorMessage = '❌ 이 브라우저는 Web Bluetooth를 지원하지 않습니다 (Chrome/Edge 사용 권장).';
+                // alert(errorMessage); // alert 대신 Scratch 환경에 맞는 UI 메시지를 사용하는 것이 좋습니다.
+                console.error(errorMessage);
+                return Promise.reject('Web Bluetooth API를 사용할 수 없습니다.');
+            }
+
+            console.log(`장치 검색 및 연결 시도: ${Scratch3Esp32Bluetooth.DEVICE_NAME}`);
+
+
+
+            try {
+                // 1. 장치 요청 (검색) - ⭐️ 이 부분을 수정해야 합니다.
+                const device = await navigator.bluetooth.requestDevice({
+                    // name 대신 namePrefix를 사용하여 "ZumiAI-"로 시작하는 모든 장치를 검색합니다.
+                    filters: [{
+                        namePrefix: Scratch3Esp32Bluetooth.DEVICE_NAME
+                    }],
+                    optionalServices: [Scratch3Esp32Bluetooth.SERVICE_UUID]
+                });
+
+                this.device = device;
+
+
+
+
+
+            // try {
+            //     // 1. 장치 요청 (검색)
+            //     const device = await navigator.bluetooth.requestDevice({
+            //         filters: [{ name: Scratch3Esp32Bluetooth.DEVICE_NAME }],
+            //         optionalServices: [Scratch3Esp32Bluetooth.SERVICE_UUID]
+            //     });
+
+            //     this.device = device;
+
+                // 2. 연결 해제 이벤트 리스너 등록
+                this.device.addEventListener('gattserverdisconnected', this.onDisconnected.bind(this));
+
+                console.log(`장치 연결 중 (${device.name})...`);
+
+                // 3. GATT 서버 연결
+                const server = await device.gatt.connect();
+
+                // 4. 서비스 가져오기
+                const service = await server.getPrimaryService(Scratch3Esp32Bluetooth.SERVICE_UUID);
+
+                // 5. Characteristic 가져오기
+                this.characteristic = await service.getCharacteristic(Scratch3Esp32Bluetooth.CHARACTERISTIC_UUID);
+
+                // 6. Notify 리스너를 미리 추가합니다. (notifications 시작/중지 시 활성화)
+                this.characteristic.addEventListener('characteristicvaluechanged', this.handleCharacteristicValueChanged.bind(this));
+
+                console.log('✅ ZumiAI 장치 연결 성공!');
+
+                this.startSendingLoop();
 
             } catch (error) {
-                // 포트가 닫힌 경우 등
-                break;
-            }
-        }
-    }
-
-
-    // ===============================================
-    // 데이터 전송
-    // ===============================================
-
-    // 커맨드와 파라미터 형태 구성
-    async sendCommand(commandType, ...params) {
-
-        const commandName = Object.keys(CommandType).find(key => CommandType[key] === commandType);
-        if (!commandName) {
-            console.error(`Unknown commandType: ${commandType}`);
-            return;
-        }
-
-        // 1. 데이터 본문 구성 (파이썬 Command_variable_byte.toArray()의 일부)
-        const paramLength = CommandType_DATA_LENGTH[commandName] || 0;
-        // 커맨드 바이트(1) + 파라미터(N)
-        const payloadBytes = new Uint8Array(1 + paramLength);
-
-        payloadBytes[0] = commandType;
-
-        for (let i = 0; i < params.length && i < paramLength; i++) {
-            // 파라미터는 1바이트 크기로 전송
-            payloadBytes[i + 1] = params[i] & 0xFF;
-        }
-
-        if((commandType == CommandType.COMMAND_MOTOR1_INFINITE) || (commandType== CommandType.COMMAND_MOTOR2_INFINITE))
-        {
-            this.motorTrigger = true;
-        }
-        else
-        {
-            this.motorTrigger = false;
-        }
-
-        // 전송 데이터 패킷 구성
-        await this.makePacket(payloadBytes);
-    }
-
-    // 실제 보낼 데이터 패킷 구성
-    async makePacket(payloadBytes) {
-
-        // 전체 전송 데이터 배열 구성 (파이썬 makeTransferDataArray 역할)
-        const HEADER1 = 0x24; // '$'
-        const HEADER2 = 0x52; // 'R'
-
-        // 전체 메시지 길이: 헤더(2) + 커맨드(1) + 리퀘스트(1) + 파라미터(paramLength)
-        const fullMessageLength = 4 + payloadBytes.length-1;
-
-        const dataArray = new Uint8Array(fullMessageLength);
-        let index = 0;
-
-        // 헤더 ($R)
-        dataArray[index++] = HEADER1;
-        dataArray[index++] = HEADER2;
-
-        // 커맨드 바이트
-        dataArray[index++] = payloadBytes[0];
-
-        // 리퀘스트 바이트
-        dataArray[index++] = this._current_request;
-
-        // 파라미터 데이터
-        // payloadBytes.slice(1)은 commandType을 제외한 파라미터들만 포함 (파이썬 data[1:]에 해당)
-        dataArray.set(payloadBytes.slice(1), index);
-
-
-        // 새로운 명령으로 단일 버퍼를 덮어씁니다.
-        this.nextCommandPayload = dataArray;
-    }
-
-    // 실제 데이터 전송
-    async transferData(dataArray) {
-
-        if (!this.serialPort || !this.serialPort.writable) {
-                console.warn("Port not ready. Cannot transfer.");
-                return;
-        }
-
-        this.isSending = true; // 전송 시작 플래그 ON
-        let writer = null;
-        try {
-            // 명령을 보낼 때마다 새로운 writer 객체를 획득 (락 획득)
-            writer = this.serialPort.writable.getWriter();
-
-            // 쓰기 작업
-            await writer.write(dataArray);
-        } catch (error) {
-            // 락 획득 또는 쓰기 작업 중 오류 발생 시
-            console.error("Serial Write Error:", error);
-
-        } finally {
-            // 오류 여부와 관계없이 락 해제
-            if (writer) {
-                writer.releaseLock();
-            }
-            this.isSending = false; // 전송 완료/실패 후 플래그 OFF
-        }
-    }
-
-    // 루프 시작 함수 (connectPort 성공 시 호출)
-    startSendingLoop() {
-        if (this.isLoopRunning) return;
-        this.isLoopRunning = true;
-        console.log("Starting " + this.sendingLoopTime + "ms sending loop...");
-
-        // 첫 호출 시 바로 실행하고, 재귀적으로 setTimeout을 사용하여 주기를 제어
-        this.sendingLoop();
-    }
-
-    // sendingLoopTime 시간마다 실행될 실제 루프
-    async sendingLoop() {
-        const startTime = Date.now();
-
-        // 1. 현재 전송 중이 아니라면, 데이터를 보낼지 결정
-        if (!this.isSending && this.serialPort && this.serialPort.writable) {
-            let dataToSend;
-
-            if (this.nextCommandPayload) {
-                // 2. 보낼 데이터가 있다면 큐에서 꺼냄 (명령 데이터)
-                dataToSend = this.nextCommandPayload;
-                this.nextCommandPayload = null; // 사용했으므로 버퍼 비우기
-
-                await this.transferData(dataToSend);
-
-            }
-            else if (this.motorTrigger == true){
-                // 모터가 작동중인 경우, 모터를 멈추지 않도록 보냄
-                const sendACK= new Uint8Array([
-                    0x24,
-                    0x52,
-                    CommandType.COMMAND_MOTOR1_INFINITE,
-                    this._current_request,
-                    this.tSpd1,
-                    this.tSpd2,
-                    this.tDir
-                ]);
-
-                await this.transferData(sendACK); // 디버그 시 정지
-
-            }
-            else {
-                // 3. 보낼 데이터가 없다면 기본 ACK/유지 명령을 보냄 (50ms 주기 유지)
-                // ACK/Heartbeat 명령의 payloadBytes를 여기에 직접 만듭니다.
-                // (예: COMMAND_WAIT를 0바이트로 전송하거나, 별도의 ACK 커맨드를 정의해야 함)
-                // 임시: COMMAND_GOGO (파라미터 0개)를 ACK처럼 사용
-                // const commandType = CommandType.COMMAND_NONE;
-                // dataToSend = new Uint8Array([commandType]);
-
-              //  const sendACK= [0x24,0x52,0x00,this._current_request,0x00,0x00,0x00,0x00,0x00,0xFF,0xFF]; //stop
-                // 올바른 Uint8Array 형식으로 변경
-                const sendACK = new Uint8Array([
-                    0x24, // HEADER1 '$'
-                    0x52, // HEADER2 'R'
-                    0x00, // COMMAND_TYPE (예: ACK/NOP)
-                    this._current_request,
-                    0x00, 0x00, 0x00, 0x00, 0x00, // 파라미터 및 기타 데이터
-                    0xFF, 0xFF // 아마도 패킷 끝/체크섬 등
-                ]);
-
-                await this.transferData(sendACK); // 디버그 시 정지
-            }
-
-            // 데이터 전송 실행 (비동기로 실행되나, 다음 루프를 막지는 않음)
-            // transferData를 사용하여 락 획득/해제는 내부에서 처리
-        }
-
-        // 2. 남은 시간 계산 후 다음 루프 예약
-        const elapsedTime = Date.now() - startTime;
-        // 주기를 유지하도록 딜레이를 계산합니다.
-        const delay = Math.max(0, this.sendingLoopTime - elapsedTime);
-
-        // ⭐️ setTimeout을 사용하여 다음 루프 실행을 예약합니다.
-        if (this.isLoopRunning) {
-            setTimeout(() => {
-                this.sendingLoop(); // 자기 자신을 다시 호출하여 루프를 지속
-            }, delay);
-        }
-    }
-
-
-    // ===============================================
-    // 시리얼 연결 및 설정
-    // ===============================================
-    /**
-     * 시리얼 포트 연결 및 설정
-     */
-    async connectPort () {
-        if (this.serialPort) return;
-
-        try {
-            // 사용자에게 포트 선택 요청
-            this.serialPort = await navigator.serial.requestPort();
-
-            // 포트 열기 (표준 보드레이트: 115200)
-            await this.serialPort.open({ baudRate: 115200 });
-
-            this.readSerial(); // 데이터 수신 시작
-
-            // 포트가 성공적으로 열렸으므로 주기적 전송 루프 시작
-            this.startSendingLoop();
-
-        } catch (error) {
-            console.error('Serial port connection failed:', error);
-            this.serialPort = null;
-        }
-    }
-
-    /**
-     * 시리얼 포트 연결 끊기
-     */
-    async disconnectPort () {
-        if (this.serialPort) {
-            if (this.reader) await this.reader.cancel();
-            await this.serialPort.close();
-            this.isLoopRunning = false; // 루프 중지 플래그 설정
-            this.serialPort = null;
-            this.reader = null;
-            this.receivedData = '';
-        }
-    }
-
-    /**
-     * 시리얼 연결 상태
-     */
-    getConnectState()
-    {
-        return this.connectState;
-    }
-
-
-
-openConfig() {
-    this._openConfig();
-}
-
-_openConfig() {
-    // 이미 열려있으면 삭제
-    const oldModal = document.getElementById('zumi-config-modal');
-    if (oldModal) oldModal.remove();
-
-    const modal = document.createElement('div');
-    modal.id = 'zumi-config-modal';
-    modal.style = `
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0,0,0,0.5);
-        z-index: 99999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    `;
-
-    modal.innerHTML = `
-        <div style="
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            width: 320px;
-            font-size: 16px;
-        ">
-            <h3>Zumi AI 설정</h3>
-            <!--
-            <div style="text-align:center; margin-bottom:10px;">
-                <img src="data:image/png;base64,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"
-                    width="100" height="100">
-            </div>
-            -->
-
-            <label>통신 간격 선택</label><br>
-            <select id="esp32-port-select" style="width:100%; margin-bottom: 10px;">
-                <option>100 ms</option>
-                <option>150 ms</option>
-                <option>200 ms</option>
-            </select>
-
-            <label>작동 모드</label><br>
-            <!--
-            <input id="esp32-baud" type="number" value="115200" style="width:100%;">
-            -->
-            <select id="esp32-port-select" style="width:100%; margin-bottom: 10px;">
-                <option>순차 모드</option>
-                <option>즉시 모드</option>
-            </select>
-
-
-            <div style="margin-top: 15px; text-align:right;">
-                <button id="esp32-save-btn">저장</button>
-                <button id="esp32-close-btn">닫기</button>
-            </div>
-        </div>
-    `;
-
-    document.body.appendChild(modal);
-
-    // 닫기 버튼 이벤트
-    document.getElementById('esp32-close-btn').onclick = () => modal.remove();
-
-    // 저장 버튼 이벤트
-    document.getElementById('esp32-save-btn').onclick = () => {
-        const port = document.getElementById('esp32-port-select').value;
-        const baud = document.getElementById('esp32-baud').value;
-
-        console.log('Saved config:', port, baud);
-
-        modal.remove();
-    };
-}
-
-// _openConfig() {
-//     // 이미 열려있으면 삭제
-//     const oldModal = document.getElementById('zumi-config-modal');
-//     if (oldModal) oldModal.remove();
-
-//     const modal = document.createElement('div');
-//     modal.id = 'zumi-config-modal';
-//     modal.style = `
-//         position: fixed;
-//         top: 0; left: 0; right: 0; bottom: 0;
-//         background: rgba(0,0,0,0.5);
-//         z-index: 99999;
-//         display: flex;
-//         align-items: center;
-//         justify-content: center;
-//     `;
-
-//     modal.innerHTML = `
-//         <div style="
-//             background: white;
-//             padding: 20px;
-//             border-radius: 12px;
-//             width: 320px;
-//             font-size: 16px;
-//         ">
-//             <h3>ESP32 설정</h3>
-
-//             <label>포트 선택</label><br>
-//             <select id="esp32-port-select" style="width:100%; margin-bottom: 10px;">
-//                 <option>COM3</option>
-//                 <option>COM4</option>
-//             </select>
-
-//             <label>통신 속도</label><br>
-//             <input id="esp32-baud" type="number" value="115200" style="width:100%;">
-
-//             <div style="margin-top: 15px; text-align:right;">
-//                 <button id="esp32-save-btn">저장</button>
-//                 <button id="esp32-close-btn">닫기</button>
-//             </div>
-//         </div>
-//     `;
-
-//     document.body.appendChild(modal);
-
-//     // 닫기 버튼 이벤트
-//     document.getElementById('esp32-close-btn').onclick = () => modal.remove();
-
-//     // 저장 버튼 이벤트
-//     document.getElementById('esp32-save-btn').onclick = () => {
-//         const port = document.getElementById('esp32-port-select').value;
-//         const baud = document.getElementById('esp32-baud').value;
-
-//         console.log('Saved config:', port, baud);
-
-//         modal.remove();
-//     };
-// }
-
-
-    /*
-    // 시리얼 포트로 데이터 쓰기
-    // @param {object} args - 블록에서 전달된 인수
-    // 사용하지 않음 x
-
-    async writeValue (args) {
-        // const encoder = new TextEncoder();
-        // const writer = port.writable.getWriter();
-        // await writer.write(encoder.encode(sendData));
-        // writer.releaseLock();
-
-        let writer = null;
-        try {
-            //await this.writer.write(encoder.encode(data));
-
-            writer = this.serialPort.writable.getWriter();
-            // const data = String(args.TEXT) + '\n'; // ESP32가 줄바꿈을 인식하도록 추가
-            // const encoder = new TextEncoder();
-
-            const encoder = new TextEncoder(); // TextEncoder는 기본적으로 UTF-8을 사용하지만, 명시적으로 확인
-            const data = encoder.encode(args.TEXT + '\n'); // 텍스트에 줄바꿈(\n) 추가
-
-            await writer.write(data);
-
-            console.log("SUCCESS: writeValue.");
-
-        } catch (error) {
-            console.error('Serial write failed:', error);
-        } finally {
-                // 4. 오류 여부와 관계없이 락 해제
-                if (writer) {
-                    writer.releaseLock();
+                console.error('❌ BLE 연결 오류:', error);
+                this.device = null;
+                this.characteristic = null;
+
+                // "Bluetooth adapter not available." 오류를 명확하게 구분하여 안내
+                if (error.message && error.message.includes('Bluetooth adapter not available')) {
+                    // alert('⚠️ 블루투스 어댑터 오류: 컴퓨터의 블루투스가 켜져 있는지 확인하고 브라우저를 재시작해 보세요.');
+                    console.error('Bluetooth 어댑터에 접근할 수 없습니다. OS 설정 확인 필요.');
+                    return Promise.reject('Bluetooth 어댑터에 접근할 수 없습니다. OS 설정 확인 필요.');
                 }
-            }
-    }
 
-    // 클래스 이름 값을 가져오기
-    _detectReading(detectKey) {
-        if (this.hasOwnProperty(detectKey)) {
-            return this[detectKey];
+                // Scratch에게 기타 오류 발생을 알립니다.
+               // return Promise.reject(`연결 실패: ${error.message}`);
+            }
         }
-        return 0;
-    }
-    */
+
+        // ===============================================
+        // 개별 블록 함수 (블루투스 연결 및 설정)
+        // ===============================================
+        /**
+         * [장치 연결 끊기] 블록의 실제 로직.
+         * 연결된 장치의 GATT 서버 연결을 끊습니다.
+         */
+        disconnectDevice() {
+            if (this.device && this.device.gatt.connected) {
+                console.log('연결 해제 요청 중...');
+                // onDisconnected 이벤트가 자동으로 실행되어 상태를 정리합니다.
+                this.device.gatt.disconnect();
+            } else {
+                console.log('이미 연결이 끊어져 있습니다.');
+            }
+        }
+
+        /**
+         * 연결 해제 이벤트 핸들러.
+         * 장치와 연결이 끊어졌을 때 호출됩니다.
+         */
+        onDisconnected() {
+            console.log('🔌 장치와 연결이 해제되었습니다.');
+
+            this.isLoopRunning = false; // 루프 중지 플래그 설정
+            this.receivedData = '';
+
+            this.device = null;
+            this.characteristic = null;
+
+            // 필요하다면 Scratch 런타임에 이벤트를 발생시킬 수 있습니다.
+            // 예: this.runtime.emit('BLE_DISCONNECTED');
+        }
+
+        /**
+         * [장치가 연결되었는가?] 블록의 실제 로직.
+         * @returns {boolean} 현재 장치에 연결되어 있으면 true
+         */
+        isConnected() {
+            // 장치 객체가 있고, GATT 서버가 연결 상태인지 확인
+            return !!(this.device && this.device.gatt.connected);
+        }
+
+
+        /**
+         * [데이터 알림 활성화/비활성화] 블록의 실제 로직.
+         * @param {object} args - STATE ('활성화' 또는 '비활성화')
+         * @returns {Promise<void>}
+         */
+        async toggleNotify(args) {
+            if (!this.characteristic) {
+                console.error('Notify를 설정할 Characteristic이 없습니다. 먼저 장치에 연결하세요.');
+                return;
+            }
+
+            const state = args.STATE.toLowerCase();
+
+            try {
+                if (state === '활성화' && !this.isNotifying) {
+                    await this.characteristic.startNotifications();
+                    this.isNotifying = true;
+                    console.log('🔔 BLE Notify 활성화 완료.');
+                } else if (state === '비활성화' && this.isNotifying) {
+                    await this.characteristic.stopNotifications();
+                    this.isNotifying = false;
+                    console.log('🔕 BLE Notify 비활성화 완료.');
+                } else {
+                    console.log(`Notify 상태가 이미 ${state}입니다.`);
+                }
+            } catch (error) {
+                console.error('Notify 설정 중 오류 발생:', error);
+                return Promise.reject(`Notify 설정 실패: ${error.message}`);
+            }
+        }
+
+
+
+
+        // // -----------------------------------------------------
+        // // [NEW] 고정 패킷 전송 로직
+        // // -----------------------------------------------------
+
+        // /**
+        //  * [고정 패킷 (24 52 0A 00 0A 0A 0A) 전송] 블록의 실제 로직.
+        //  * 미리 정의된 HEX 명령을 장치로 전송합니다.
+        //  * @returns {Promise<void>}
+        //  */
+        // async sendFixedCommand() {
+        //     if (!this.characteristic) {
+        //         console.error('Characteristic이 없습니다. 먼저 장치에 연결하세요.');
+        //         return;
+        //     }
+
+        //     try {
+        //         const FIXED_COMMAND_BYTES = [0x24, 0x52, 0x0A, 0x00, 0x0A, 0x0A, 0x0A];
+
+        //         // 1. 고정 바이트 배열을 Uint8Array로 변환하여 dataBuffer 생성
+        //         // Web Bluetooth API의 writeValue 메서드는 Typed Array(Uint8Array)를 기대합니다.
+        //         const dataBuffer = new Uint8Array(FIXED_COMMAND_BYTES).buffer;
+
+        //         // 2. 값 쓰기 (Write with Response)
+        //         await this.characteristic.writeValue(dataBuffer);
+
+        //         console.log(`✅ 고정 패킷 전송 성공: ${FIXED_COMMAND_BYTES}`);
+        //     } catch (error) {
+        //         console.error('❌ 고정 패킷 전송 오류:', error);
+        //         return Promise.reject(`고정 패킷 전송 실패: ${error.message}`);
+        //     }
+        // }
+
+        // async sendFixedCommand1() {
+        //     if (!this.characteristic) {
+        //         console.error('Characteristic이 없습니다. 먼저 장치에 연결하세요.');
+        //         return;            }
+
+        //     try {
+        //         const FIXED_COMMAND_BYTES = [0x24, 0x52, 0x0A, 0x00, 0x00, 0x00, 0x00];
+
+        //         // 1. 고정 바이트 배열을 Uint8Array로 변환하여 dataBuffer 생성
+        //         // Web Bluetooth API의 writeValue 메서드는 Typed Array(Uint8Array)를 기대합니다.
+        //         const dataBuffer = new Uint8Array(FIXED_COMMAND_BYTES).buffer;
+
+        //         // 2. 값 쓰기 (Write with Response)
+        //         await this.characteristic.writeValue(dataBuffer);
+
+        //         console.log(`✅ 고정 패킷 전송 성공: ${FIXED_COMMAND_BYTES}`);
+        //     } catch (error) {
+        //         console.error('❌ 고정 패킷 전송 오류:', error);
+        //         return Promise.reject(`고정 패킷 전송 실패: ${error.message}`);
+        //     }
+        // }
+
+
+
+
+
 
 
 }
 
-module.exports = Scratch3Esp32Serial;
+module.exports = Scratch3Esp32Bluetooth;

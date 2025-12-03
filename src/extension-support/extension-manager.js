@@ -27,7 +27,8 @@ const builtinExtensions = {
     gdxfor: () => require('../extensions/scratch3_gdx_for'),
     //esp32serial: Scratch3Esp32Serial // ID는 esp32serial, 값은 불러온 클래스/모듈
 
-    zumiAI: () => require('../extensions/scratch3_esp32serial') // <-- 이 줄 추가
+    zumiAIS: () => require('../extensions/scratch3_esp32serial'), // <-- 이 줄 추가
+    zumiAIB: () => require('../extensions/scratch3_esp32bluetooth') // <-- 이 줄 추가
 
 };
 
