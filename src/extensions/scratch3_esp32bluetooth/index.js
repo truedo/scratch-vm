@@ -1399,6 +1399,11 @@ class Scratch3Esp32Bluetooth {
 
         groupConnect(args){
             //this._openConfig();
+            // vm.connectionStatus = "no";
+            // vm.emit('CONNECTION_STATUS', vm.connectionStatus);
+         //   this.connectionAlive = newStatus;
+            var newStatus ="ok"
+            this.runtime.emit('CONNECTION_STATUS', newStatus);
         }
 
         connectPort(args){
@@ -1414,9 +1419,19 @@ class Scratch3Esp32Bluetooth {
         }
 
         groupLED(args){
+
+            var newStatus ="no"
+            this.runtime.emit('CONNECTION_STATUS', newStatus);
+
+
         }
 
         groupDisplay(args){
+
+            var newStatus ="loading"
+            this.runtime.emit('CONNECTION_STATUS', newStatus);
+
+
         }
 
         groupText(args){
@@ -2357,6 +2372,15 @@ class Scratch3Esp32Bluetooth {
     }
 
 
+        // ===============================================
+        // 연결 상태 전송 -> GUI 표시
+        // ===============================================
+        sendGUI_ConnectionStatus(value)
+        {
+            //var newStatus ="ok"
+            this.runtime.emit('CONNECTION_STATUS', value);
+        };
+
 
 
 
@@ -2874,7 +2898,10 @@ class Scratch3Esp32Bluetooth {
 
                 console.log('✅ ZumiAI 장치 연결 성공!');
 
+                this.sendGUI_ConnectionStatus("ok")
+
                 this.startSendingLoop();
+
 
             } catch (error) {
                 console.error('❌ BLE 연결 오류:', error);
@@ -2905,6 +2932,8 @@ class Scratch3Esp32Bluetooth {
                 console.log('연결 해제 요청 중...');
                 // onDisconnected 이벤트가 자동으로 실행되어 상태를 정리합니다.
                 this.device.gatt.disconnect();
+
+                this.sendGUI_ConnectionStatus("no")
             } else {
                 console.log('이미 연결이 끊어져 있습니다.');
             }
@@ -2967,7 +2996,6 @@ class Scratch3Esp32Bluetooth {
                 return Promise.reject(`Notify 설정 실패: ${error.message}`);
             }
         }
-
 
 
 

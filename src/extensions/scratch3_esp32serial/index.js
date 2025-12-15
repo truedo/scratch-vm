@@ -2319,6 +2319,18 @@ class Scratch3Esp32Serial {
 
 
     // ===============================================
+    // 연결 상태 전송 -> GUI 표시
+    // ===============================================
+    sendGUI_ConnectionStatus(value)
+    {
+        //var newStatus ="ok"
+        this.runtime.emit('CONNECTION_STATUS', value);
+    };
+
+
+
+
+    // ===============================================
     // 데이터 수신
     // ===============================================
 
@@ -2336,6 +2348,7 @@ class Scratch3Esp32Serial {
             // 타임아웃 발생!
             if (this.connectState === true) {
                 this.connectState = false; // 연결 상태를 끊김(false)으로 변경
+                this.sendGUI_ConnectionStatus("no");
             }
         }, this.CONNECTION_TIMEOUT_MS);
     }
@@ -2453,6 +2466,7 @@ class Scratch3Esp32Serial {
                 // =======================================================
                 // 수신 완료 시 연결 상태 설정 및 타이머 재설정
                 this.connectState = true;
+                this.sendGUI_ConnectionStatus("ok");
                 this._resetConnectionTimeout(); // 다음 패킷을 기다리는 타이머 시작!
                 // =======================================================
 
