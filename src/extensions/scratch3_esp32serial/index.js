@@ -4,6 +4,8 @@ const BlockType = require('../../extension-support/block-type');
 const ArgumentType = require('../../extension-support/argument-type');
 
 const {
+    Zumi_Config,
+
     Form_Name,
 
     Form_groupConnect,
@@ -308,6 +310,9 @@ const PacketIndex = {
 class Scratch3Esp32Serial {
     constructor (runtime) {
 
+        this.testMode = 0;
+        this.actionMode = 0;
+
         this.sendingLoopTime = 150;//basic 150ms
 
        // the_locale = this._setLocale();
@@ -457,9 +462,10 @@ class Scratch3Esp32Serial {
             color3: '#132F85', // 입력 영역 강조
 
             name: Form_Name[theLocale], // 확장자 메뉴 이름 (필요시 translation.js에서 가져오는 것으로 변경 가능)
+            //왼편 확장 대표 아이콘 : base64 인코딩
             //blockIconURI: iconURI, // 아이콘 URI
             //blockIconURI: 'data:image/svg+xml;base64,PHN2ZyB2aW... [긴 SVG 문자열]', // 예시 코드
-           // blockIconURI: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIxNy41IiBmaWxsPSIjRkY2Njg4Ii8+PHRleHQgZmlsbD0iI0ZGRiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjI0IiB4PSIxMiIgeT0iMjgiPlM8L3RleHQ+PC9zdmc+',
+            // blockIconURI: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIxNy41IiBmaWxsPSIjRkY2Njg4Ii8+PHRleHQgZmlsbD0iI0ZGRiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjI0IiB4PSIxMiIgeT0iMjgiPlM8L3RleHQ+PC9zdmc+',
             //blockIconURI: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAAcCAYAAACdz7SqAAAABHNCSVQICAgIfAhkiAAAAAFzUkdCAK7OHOkAAAAEZ0FNQQAAsY8L/GEFAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAxJJREFUSEu9l01oE0EUx/+zm22atlSrtiC0FEWstH6AiJciKh40pRc9pJ4sCOJFpApCwYN3T1o9GjwXRfyAUsST14AIniqKUKjWgtWkpslmszu+tzv52M3GxsT2l0x25u3O/Pe9+YyQxPtlB1deWlizJCICkPQBKFONZFszSFj0e26vgZm44VrEu6+2nHhSwI4YoGssFCLIhJgagbxyW8yYAkO7gKeJKMRoMictG4jootl2N4ZUWXo1B9w5FYG2kgUM8nDTBBlqXAiBrjbg9WcJzdA841agk9a3NRJV5S1DI8UaUbfb+csDoMXktaMarkIMP8zJnpjg++4TeqQd6KBQUPxbxaYBaq9TxjSpT4GiI7GzQ/NEt5OoIFURi8JZSuFL8iqyq2kIjkWTsKed7QYGLkwjNjoJK23CJltZlD2FbkDPLODt9WFV7f9x/EYSbUcvw8rnXVHlioRo07A0d88rhjCeSKhcOGfiZ9HevU2V/Hx6dhcGdVmpf8vx45jbdlGV/MwkH+HV7CzGL4YL9+8ZxJu5eaRSKWXxQy75hqy/00R4H9oFXj1pEeE3C4MnIGEVTfcaJFgrXCWIios7DcJQ5rr3AzQmWuYfH69DQ62Upo5WJ7yauzvx/cZeyv9UnfDkaagz6zme6bX8SqfdK81A91pDoF2fqMErRAjTU1MYPDCE+ecvlMVPZuUHdg/248jIiLIEkI5PV4kKOAWg98QlrxjC4sJHlQtneXFJ5WoZOD2JYlWQKp5aJvT9J3Hs5mN0x2h1IhMfXfiA0UyKUIpR64cSt9Bz/jZsXn/JxlSWQYZCIKJRGN1UiWr5gl2nu1zCe8UNqZkBnHUWpLMSlXt9a28Z3pZU1oXv1Wl1Q7x2hTtWBCzaZfoqa281tOPQ1KgkWsSobnOJ63qCJbikeT78zROu0GoqIWA7NjTH8WK/FTgc3i4dWl+npB29+m02B3bsN03LsX3Up/fjUfzM08iygwPIg00tJ/rJFCQO9wlMHIzwAVzKD98dXJuzsJz1/lZUw5VagevzYT5OHj4Y44MX8AckpVAZykJ1kwAAAABJRU5ErkJggg==',
             blockIconURI: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAfCAMAAACxiD++AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAKdUExURQAAADOZ5jyZ9zye9zyg+zyf+zuf+Tyf+Tyg+zug+zee+Tmc9lWq/0mS/zyc+Tud+UCs/z+n/z+m/z6n/z2m/zqc+Dmc+VWq/zqe9zyd+j6m/zud+Dud9zud+Duc9zue+T6k/zuc+Dma8zmb+D6l/zue+jyc9Tud+j2j/z2i/zud+Dud+juc+Dud+Duf+jyh/T2h/Tyg/Dye9juZ6TqW5TqX5TuX5Tya7Due+Dyf+juX6i9upBw/XxY1URY2Uxg3UyNJbTR8vT2g+jud+T2g+C1roQsSGAAAAAIAABgvQTaAwDyh/zyf/DmR4Bs/WwoKCiUpKB0gIAgICCQmJSImJQIDAwQFBCRQdECp/z2h/zyg/jaI0hczSkBCQ83S04+TlAQIBzI0M73Av6KlpRcbHAEAABxCY0Gs/zaI0xc0S1hbXP///7m7uxAWFEZIR/b5+M/R0SswMB1DZRc0TFVYWLa4uBEXFUNGRe/y8szNziwwMB1DZFRXWLa3uBAWFe/z8svMzSsvMLa4uREXFkRGRvDz88vNzVVXWLi6uhAUE0JFRPD09M7P0CktLTs9Pb/FxYmMjAQGBiosLK2ysaCiohUXFzyg/TmO2xw8VgEBAQQFBgMEBAQFBQYHBwQEBCFNckCq/z2f9ipjkwYIChIlMzN5tzuf+zqX5ythjhQpPBAlOBAmORAmOBAlNxo1TTFyqjqd+EGn/0Ck+EGk+UGk+kCk+UGl+zyj/zqc+Dud+jud+jyd+Dud+Dyi/zqd9zqc9jyf+zqd+Tic+Dmc9Due+Tyh/jud+Tuf+Cuq/zud9zyd+Duf/Dyh/Tyg/Dug/Dug/Tyg/Tyf+zuc+D+c+jOZ/zmg9zmd9zud+Due+jqd+Tud+Tuc+juc+Dqc9Tyc9Fro8bMAAADfdFJOUwAKPISvsrKys6yBNgYHVdj//////9NQA0LW//7//////9k/lP//nb7//77GvsT//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8TEtv+9jf/9lUPU/85FBlvS+Pv7+/v7+NBdBUOXubq5ubq3mkjoNDx5AAAACXBIWXMAAA7DAAAOwwHHb6hkAAABwUlEQVQ4T2NgYGRiZmFlAwF2VhTAwcnFzcPAwMvHLyAoJAgGQqhAWERUTJxBQlJKWgYKZFGBnLyCohKDsgqUiw2oyqsxqGtAOViBphaDliaUjRVoajPo4FegCzFBT98AExiqwhXoGRmbmKIBEzNzCz2oAksraxtbO3Rg7+DoBFHg7OLq5o4FeHh6eYMV+Pj6gQX8AwLBtHtQcEgoiA4Lj4jUBfoiKjoGLB4bF58AZiQmJaeA6NS0dKACLc2ojEyweFZ2Ti6YkZdfUAiiU4tgCorB4iXZpWVgRnlFZRWITq1GVVCTXVsHZpTXNzSCaHQFJdlNzWBGS2sbxAo0Be3ZHZ1gRld3Ty+IBirwBvsC6si+/gkTwYxJk6dMBdEeUBOmTZ8BFp85azaYdnefMxdMzZu/AKxAfuGixWABNJC6ZCkkJGWXLV+xctVqNLBm7br1KhugsamqsHHT5s1bUMDWbRu37wBFFiTBODs770QHzqAEswtsAm6guZuQAl2GPXhT9d59DPsjgUkPFzhw8BDD4SNHfVRxgAM+x44znDh56vSZs0BwDh2cv3Dx0mUGBoYrV69dv3Hz5s1b6OD2nbv3GBgAt7keqNrw6tEAAAAASUVORK5CYII=',
 
@@ -489,12 +495,12 @@ class Scratch3Esp32Serial {
                     blockType: BlockType.COMMAND,
                     text: Form_disconnectPort[theLocale],
                 },
-                {
-                    opcode: 'getConnectState',
-                    blockType: BlockType.REPORTER,
-                    text: Form_getConnectState[theLocale],
-                    arguments: {}
-                },
+                // {
+                //     opcode: 'getConnectState',
+                //     blockType: BlockType.REPORTER,
+                //     text: Form_getConnectState[theLocale],
+                //     arguments: {}
+                // },
                 '---',
 
                 //-------------------------------------------//
@@ -908,7 +914,7 @@ class Scratch3Esp32Serial {
                         },
                         LINE_TIME: {
                             type: ArgumentType.NUMBER,
-                            defaultValue: 0,
+                            defaultValue: 1,
                             acceptReporters: true,
                         },
                     }
@@ -925,7 +931,7 @@ class Scratch3Esp32Serial {
                         },
                         LINE_DISTANCE: {
                             type: ArgumentType.NUMBER,
-                            defaultValue: 0,
+                            defaultValue: 5,
                             acceptReporters: true,
                         },
                     }
@@ -1631,11 +1637,54 @@ class Scratch3Esp32Serial {
 
 
     // ===============================================
+    // 개별 블록 함수 (동작 상태 확인 함수)
+    // ===============================================
+
+    waitForStatusChange() {
+        var seq = 0;
+        return new Promise(resolve => {
+            // 1. 상태를 확인하는 함수 정의 (주기적인 확인 필요)
+            const checkStatus = () => {
+                // this.reqPSTAT 값이 0이 아니면
+
+                if(seq == 0)
+                {
+                    if (this.reqPSTAT !== 0) {
+                        seq = 1;
+                        // clearInterval(intervalId); // 2. 타이머를 멈추고
+                        // resolve(this.reqPSTAT); // 3. 대기를 완료합니다.
+                    } else {
+                        // 아직 0이면 계속 기다립니다.
+                        // 이 코드가 주 실행 스레드를 막지 않으면서 주기적으로 상태를 확인합니다.
+                    }
+                }
+                else if(seq == 1)
+                {
+                    if (this.reqPSTAT !== 1) {
+                        clearInterval(intervalId); // 2. 타이머를 멈추고
+                        resolve(this.reqPSTAT); // 3. 대기를 완료합니다.
+                        console.log("wait PSTAT checked");
+                    } else {
+                        // 아직 0이면 계속 기다립니다.
+                        // 이 코드가 주 실행 스레드를 막지 않으면서 주기적으로 상태를 확인합니다.
+                    }
+                }
+
+
+            };
+
+            // 4. 짧은 간격(예: 50ms)으로 상태를 주기적으로 확인하는 타이머 시작
+            // (참고: 상태 업데이트가 '이벤트 리스너'로 구현되어 있다면, setInterval 대신 이벤트 리스너를 사용하는 것이 더 효율적입니다.)
+            const intervalId = setInterval(checkStatus, 50);
+        });
+    }
+
+    // ===============================================
     // 개별 블록 함수 (move 역할)
     // ===============================================
 
     //지정된 거리만큼 주미를 전진시킵니다.
-    move_dist(args)
+    async move_dist(args)
     {
         let speed = parseInt(args.MOVE_SPEED);
         let dir = parseInt(args.MOVE_DIRECTION);
@@ -1656,10 +1705,15 @@ class Scratch3Esp32Serial {
             dist,
             dir
         );
+
+        if(this.actionMode == 0)
+        {
+            await this.waitForStatusChange();
+        }
     }
 
     // 빠르게 지정된 거리 만큼 이동
-    move_dist_quick(args) {
+    async move_dist_quick(args) {
 
         let dir = parseInt(args.MOVE_DIRECTION);
         let dist = parseInt(args.MOVE_DIST);
@@ -1685,6 +1739,11 @@ class Scratch3Esp32Serial {
             );
         }
 
+        if(this.actionMode == 0)
+        {
+            await this.waitForStatusChange();
+        }
+
     }
 
 
@@ -1695,7 +1754,7 @@ class Scratch3Esp32Serial {
      * @param {object} args - { DIRECTION: string (0|1), DEGREE: number, SPEED: string (1|2|3) }
      */
 
-    turn_angle(args) {
+    async turn_angle(args) {
 
         let dir = parseInt(args.TURN_DIRECTION); // 0 (왼쪽) 또는 1 (오른쪽)
         let deg = Math.round(parseFloat(args.TURN_ANGLE)); // 각도는 정수화
@@ -1727,10 +1786,15 @@ class Scratch3Esp32Serial {
             degHigh,
             dir
         );
+
+        if(this.actionMode == 0)
+        {
+            await this.waitForStatusChange();
+        }
     }
 
     // 빠르게 지정된 각도만큼 회전
-    turn_angle_quick(args) {
+    async turn_angle_quick(args) {
 
         let dir = parseInt(args.TURN_DIRECTION); // 0 (왼쪽) 또는 1 (오른쪽)
         let deg = Math.round(parseFloat(args.TURN_ANGLE)); // 각도는 정수화
@@ -1755,6 +1819,11 @@ class Scratch3Esp32Serial {
                 CommandType.COMMAND_QUICK_RIGHT,
                 deg,
             );
+        }
+
+        if(this.actionMode == 0)
+        {
+            await this.waitForStatusChange();
         }
     }
 
@@ -2396,6 +2465,17 @@ class Scratch3Esp32Serial {
         this.zumiCatCenter[1] = dataArray[PacketIndex.DATA_DETECT_CAT_Y - offset];
 
         //console.log(this.zumiMarkerDetected);
+
+        // this.reqINFO = dataArray[PacketIndex.DATA_INFO - offset];
+        // this.reqREQ = dataArray[PacketIndex.DATA_REQ - offset];
+        // this.reqPSTAT = dataArray[PacketIndex.DATA_PSTAT - offset];
+
+        // this.btn = dataArray[PacketIndex.DATA_BTN_INPUT - offset];
+        // this.battery = dataArray[PacketIndex.DATA_BATTERY - offset];
+
+
+        //console.log(this.reqPSTAT);
+
     }
 
     /**
@@ -2785,16 +2865,20 @@ class Scratch3Esp32Serial {
     /**
      * 시리얼 연결 상태
      */
-    getConnectState()
-    {
-        return this.connectState;
-    }
+    // getConnectState()
+    // {
+    //     return this.connectState;
+    // }
 
 
 
 openConfig() {
     this._openConfig();
 }
+
+
+
+
 
 _openConfig() {
     // 이미 열려있으면 삭제
@@ -2821,34 +2905,33 @@ _openConfig() {
             width: 320px;
             font-size: 16px;
         ">
-            <h3>Zumi AI 설정</h3>
+            <h3>${Zumi_Config.title[theLocale]}</h3>
+
             <!--
             <div style="text-align:center; margin-bottom:10px;">
                 <img src="data:image/png;base64,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"
                     width="100" height="100">
             </div>
             -->
-
+<!--
             <label>통신 간격 선택</label><br>
             <select id="esp32-port-select" style="width:100%; margin-bottom: 10px;">
                 <option>100 ms</option>
                 <option>150 ms</option>
                 <option>200 ms</option>
             </select>
+-->
+            <label>${Zumi_Config.actionMode[theLocale]}</label><br>
 
-            <label>작동 모드</label><br>
-            <!--
-            <input id="esp32-baud" type="number" value="115200" style="width:100%;">
-            -->
-            <select id="esp32-port-select" style="width:100%; margin-bottom: 10px;">
-                <option>순차 모드</option>
-                <option>즉시 모드</option>
+            <select id="esp32-mode" style="width:100%; margin-bottom: 10px;">
+                <option value="0">${Zumi_Config.modeSequential[theLocale]}</option>
+                <option value="1">${Zumi_Config.modeImmediate[theLocale]}</option>
             </select>
 
 
             <div style="margin-top: 15px; text-align:right;">
-                <button id="esp32-save-btn">저장</button>
-                <button id="esp32-close-btn">닫기</button>
+                <button id="esp32-save-btn">${Zumi_Config.save[theLocale]}</button>
+                <button id="esp32-close-btn">${Zumi_Config.close[theLocale]}</button>
             </div>
         </div>
     `;
@@ -2860,10 +2943,12 @@ _openConfig() {
 
     // 저장 버튼 이벤트
     document.getElementById('esp32-save-btn').onclick = () => {
-        const port = document.getElementById('esp32-port-select').value;
-        const baud = document.getElementById('esp32-baud').value;
-
-        console.log('Saved config:', port, baud);
+      //  this.testMode = document.getElementById('esp32-port-select').value;
+       // this.actionMode = document.getElementById('esp32-mode').value;
+        this.actionMode = Number(
+            document.getElementById('esp32-mode').value
+        );
+        console.log('Saved config:',this.actionMode);
 
         modal.remove();
     };

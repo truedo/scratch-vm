@@ -1,5 +1,14 @@
 // scratch-vm/src/extensions/scratch3_esp32serial/translation.js
 
+export const Zumi_Config = {
+    title: { en: 'Zumi AI Settings', ko: 'Zumi AI 설정' },
+    actionMode: { en: 'Operation Mode', ko: '작동 모드' },
+    modeSequential: { en: 'Sequential', ko: '순차 모드' },
+    modeImmediate: { en: 'Immediate', ko: '즉시 모드' },
+    save: { en: 'Save', ko: '저장' },
+    close: { en: 'Close', ko: '닫기' },
+
+};
 
 export const Form_Name = {
     'en': 'Zumi AI',
@@ -10,32 +19,32 @@ export const Form_Name = {
 
 export const Form_groupConnect = {
     'en': '🔗 Connect', // 또는 '🔗 Connection'
-    'ko': '🔗 연결하기',
+    'ko': '🔗 연결 & 설정',
     // 다른 언어 추가 가능
 };
 export const Form_groupLED = {
-    'en': '🌈 LED',
-    'ko': '🌈 LED',
+    'en': '🌈 LED blocks',
+    'ko': '🌈 LED 블록',
 };
 export const Form_groupDisplay = {
-    'en': '🖥️ Display', // 'Screen'도 가능하지만, 'Display'가 장치 화면 기능에 더 적합
-    'ko': '🖥️ 화면',
+    'en': '🖥️ Display blocks', // 'Screen'도 가능하지만, 'Display'가 장치 화면 기능에 더 적합
+    'ko': '🖥️ 화면 블록',
 };
 export const Form_groupText = {
-    'en': '⌨️ Text', // 또는 '⌨️ Text Input'
-    'ko': '⌨️ 글자',
+    'en': '⌨️ Text blocks', // 또는 '⌨️ Text Input'
+    'ko': '⌨️ 글자 블록',
 };
 export const Form_groupMove = {
-    'en': '🚗 Movement', // 'Move' (동사) 대신 'Movement' (명사)가 그룹 명칭으로 더 자연스러움
-    'ko': '🚗 이동',
+    'en': '🚗 Movement blocks', // 'Move' (동사) 대신 'Movement' (명사)가 그룹 명칭으로 더 자연스러움
+    'ko': '🚗 이동 블록',
 };
 export const Form_groupSensors = {
-    'en': '⚙️ Sensor Values', // '센서 값들'을 명확하게 표현
-    'ko': '⚙️ 센서 값들',
+    'en': '⚙️ Sensor Values blocks', // '센서 값들'을 명확하게 표현
+    'ko': '⚙️ 센서 값 블록',
 };
 export const Form_groupAI = {
-    'en': '📷 AI',
-    'ko': '📷 AI',
+    'en': '📷 AI blocks',
+    'ko': '📷 AI 블록',
 };
 
 //---------------------------------------------------//
@@ -50,10 +59,10 @@ export const Form_disconnectPort = {
     'ko': '연결 끊기',
 };
 
-export const Form_getConnectState = {
-    'en': 'Zumi AI connection status',
-    'ko': '주미 AI 연결 상태',
-};
+// export const Form_getConnectState = {
+//     'en': 'Zumi AI connection status',
+//     'ko': '주미 AI 연결 상태',
+// };
 
 //---------------------------------------------------//
 

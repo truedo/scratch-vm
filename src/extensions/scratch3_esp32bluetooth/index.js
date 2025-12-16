@@ -4,6 +4,8 @@ const BlockType = require('../../extension-support/block-type');
 const ArgumentType = require('../../extension-support/argument-type');
 
 const {
+    Zumi_Config,
+
     Form_Name,
 
     Form_groupConnect,
@@ -100,8 +102,6 @@ const {
 const iconURI = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAYAAACOEfKtAAAACXBIWXMAABYlAAAWJQFJUiTwAAAF8klEQVR4Ae2cbWxTVRjH/7ctbVc2tyEMNpWBk0VIkLcEjSAQgglTE5HEaKqJi1E/mbCP/dJA0kQbvzgTQ0Ki2T7V6AeYGoEPLJmGKPiyzZDwEpYJCHSbQIcbdLvres1zOa13Xbvdu2eTDp9fst329Lnn5XfPPfece7tphmFAmDkuccdDBDIRgUxEIBMRyEQEMhGBTEQgExHIRAQyEYFMRCATEchEBDIRgUxEIBMRyEQEMhGBTEQgExHIxMPNIByNVQBoBUDb7kgo2KTS9wBoUmFNkVCwW6U3A1gP4JJKHwxHY/S+WcW2RkLBVhV7AMAOAIMAGlWstbyOSCh4QMU2Uoy1PBVL+a7IqZu1vOZIKNg20/azBarGvKxebw9HY22RULADwBFLTBcATQnZl4lVEimN4ssteXQrQfstebQpmW1q30xshyqvxRLbofYnYW9ZYgeV8C5LLOWlzbTxM3ouHI7GPgSwWx3Z0syBSBku6IYnlTbM+uQenJQaMnKHDaqAFnDrcCFbl3G1defEjas0a4N/Vz10OybyvapfrSX1sjpo+WIz0ME7QL3djgtHPTAcjb2mepw/b2ZaGh5NL5RnofR8R99dIC5fHusK5JsrCUpm7TSx21XvbcwTNwnbAsPR2GcA3qaG+H0LsHlDPZ7fca/ujZ+cRW9/Em5vCXzlNVhQUjFpf/3OTSRvXkKJz43Xt1bh1S1LUeq/5+njQ9/iVmLIfL1ieRU2b1iFtavztXNu6TrTi8PfnYI67WdPoOp5przV9Y8iuHdb9rOW9uumPI+vDIElddBckztPOqVn5X36Xj1WVQeynx1sOWbK83jc2PviM/dFXIYNax9H55leXLoyYHsfWwI14JCRRx7x5ckBU1oheYQ+1G9u39lVM0Hej7+cR7w/Yb7e9+5LqChfaLvixcK088BwNNZkAOV02ubK6+odwt3RcfOULSSPGEveG48bNj08If3kqXPmdtO6unkpDzYn0u/TLxrzcumJJ80Ut79sygzoFF6/siw75mUYupOEpmnY0/A0pw33FTsCa+hX5oJhZXgkZb5zub2O20CnL7EwkPeCPm+wI7CEBvi5wuOZ36tJW7X3uGXJXAgxk8P4eNpRPEvgskqfuR0Z/BNGejxvDM3/5gs0pboWv+motqybCc+tqUCzz43kaBJ/X+2eMjZ3ClNsjIzo5ioknXZ2b4AlkKYltLJoaY9jOJm/B0KJbtg4c4F/XOmH3+dF9dLKbBo1OD6QQGV56YQ55ODtO0jcHkZ1VSX8/n9nB9S7RkZ1rFy+NG8ZR9s70TeQQKDEh7vJUdt1Y9/OopXFB2/WcbMpyOexE9mlFS21aLlHMmKHfzBl0QT/hV2bzM9oLXv0xG8YGR0zpdLEn6RT2k+/XjDzoLX2G3u3TZBLUyral/Z5qCyAK1f/sl2/or+IWNel1Eji3MWrpjyCZHWqdNrSe6ieSHFERl4mP+q5GehgHGvvRGal5XI5uzU47f3A/R99YTgdF2wXrmkolr9ToZ5NvTjT4yOhoC2T057CJM/r9WDxoqmXa07R9THcuDVcMO8bt4ag6ynULKvkFjWBTLl0ugZKvNlyqLeSQKfYGgOpgXt2b5zVhlzrS+Dr451YvKg0b95txztxvS8xZ+VuXFuLJ5+oNgV+9c3PuHDxGs6cu+w4v//9RJo6x5bN9UgbBo4cPY1U6j+cSD8orFvzGFYuX4KxsRQGbth6FCICc9m5dY05HtN46AQRqPB5PWjY+ZT5RnMwkxGBFh5ZVmle9Z3MrGbjwfqccrC1vajrV7QCaVCfS6qrJj96nQlFK5CujPRT7MgYyEQEMhGBTGwJpAW4kJ9pBbo0zbx70X7y7AOv8HxP3LyB4YTpb2cZBt2iqL3QEwf9zDbX+waLca439QMeC7a+YBmOxugLiM/OTt2yaOoMoO+H6LOcNwf6xusrthsh/7mIh1yFmYhAJiKQiQhkIgKZiEAmIpCJCGQiApmIQCYikIkIZCICmYhAJiKQiQhkIgKZiEAmIpCJCGQiAjkA+AeOwQKMcWZqHgAAAABJRU5ErkJggg==';
 
 let theLocale = null;
-
-// index.js (파일 상단에 위치)
 
 //CommandType ENUM 변환 (명령어 코드)
 const CommandType = {
@@ -318,6 +318,8 @@ class Scratch3Esp32Bluetooth {
 
     constructor (runtime) {
 
+        this.testMode = 0;
+        this.actionMode = 0;
 
         this.characteristic = null;
         this.device = null;
@@ -472,11 +474,15 @@ class Scratch3Esp32Bluetooth {
             color3: '#132F85', // 입력 영역 강조
 
             name: Form_Name[theLocale], // 확장자 메뉴 이름 (필요시 translation.js에서 가져오는 것으로 변경 가능)
-            //blockIconURI: iconURI, // 아이콘 URI
-            //blockIconURI: 'data:image/svg+xml;base64,PHN2ZyB2aW... [긴 SVG 문자열]', // 예시 코드
-           // blockIconURI: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIxNy41IiBmaWxsPSIjRkY2Njg4Ii8+PHRleHQgZmlsbD0iI0ZGRiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjI0IiB4PSIxMiIgeT0iMjgiPlM8L3RleHQ+PC9zdmc+',
-            //blockIconURI: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAAcCAYAAACdz7SqAAAABHNCSVQICAgIfAhkiAAAAAFzUkdCAK7OHOkAAAAEZ0FNQQAAsY8L/GEFAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAxJJREFUSEu9l01oE0EUx/+zm22atlSrtiC0FEWstH6AiJciKh40pRc9pJ4sCOJFpApCwYN3T1o9GjwXRfyAUsST14AIniqKUKjWgtWkpslmszu+tzv52M3GxsT2l0x25u3O/Pe9+YyQxPtlB1deWlizJCICkPQBKFONZFszSFj0e26vgZm44VrEu6+2nHhSwI4YoGssFCLIhJgagbxyW8yYAkO7gKeJKMRoMictG4jootl2N4ZUWXo1B9w5FYG2kgUM8nDTBBlqXAiBrjbg9WcJzdA841agk9a3NRJV5S1DI8UaUbfb+csDoMXktaMarkIMP8zJnpjg++4TeqQd6KBQUPxbxaYBaq9TxjSpT4GiI7GzQ/NEt5OoIFURi8JZSuFL8iqyq2kIjkWTsKed7QYGLkwjNjoJK23CJltZlD2FbkDPLODt9WFV7f9x/EYSbUcvw8rnXVHlioRo07A0d88rhjCeSKhcOGfiZ9HevU2V/Hx6dhcGdVmpf8vx45jbdlGV/MwkH+HV7CzGL4YL9+8ZxJu5eaRSKWXxQy75hqy/00R4H9oFXj1pEeE3C4MnIGEVTfcaJFgrXCWIios7DcJQ5rr3AzQmWuYfH69DQ62Upo5WJ7yauzvx/cZeyv9UnfDkaagz6zme6bX8SqfdK81A91pDoF2fqMErRAjTU1MYPDCE+ecvlMVPZuUHdg/248jIiLIEkI5PV4kKOAWg98QlrxjC4sJHlQtneXFJ5WoZOD2JYlWQKp5aJvT9J3Hs5mN0x2h1IhMfXfiA0UyKUIpR64cSt9Bz/jZsXn/JxlSWQYZCIKJRGN1UiWr5gl2nu1zCe8UNqZkBnHUWpLMSlXt9a28Z3pZU1oXv1Wl1Q7x2hTtWBCzaZfoqa281tOPQ1KgkWsSobnOJ63qCJbikeT78zROu0GoqIWA7NjTH8WK/FTgc3i4dWl+npB29+m02B3bsN03LsX3Up/fjUfzM08iygwPIg00tJ/rJFCQO9wlMHIzwAVzKD98dXJuzsJz1/lZUw5VagevzYT5OHj4Y44MX8AckpVAZykJ1kwAAAABJRU5ErkJggg==',
-            blockIconURI: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAfCAMAAACxiD++AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAKdUExURQAAADOZ5jyZ9zye9zyg+zyf+zuf+Tyf+Tyg+zug+zee+Tmc9lWq/0mS/zyc+Tud+UCs/z+n/z+m/z6n/z2m/zqc+Dmc+VWq/zqe9zyd+j6m/zud+Dud9zud+Duc9zue+T6k/zuc+Dma8zmb+D6l/zue+jyc9Tud+j2j/z2i/zud+Dud+juc+Dud+Duf+jyh/T2h/Tyg/Dye9juZ6TqW5TqX5TuX5Tya7Due+Dyf+juX6i9upBw/XxY1URY2Uxg3UyNJbTR8vT2g+jud+T2g+C1roQsSGAAAAAIAABgvQTaAwDyh/zyf/DmR4Bs/WwoKCiUpKB0gIAgICCQmJSImJQIDAwQFBCRQdECp/z2h/zyg/jaI0hczSkBCQ83S04+TlAQIBzI0M73Av6KlpRcbHAEAABxCY0Gs/zaI0xc0S1hbXP///7m7uxAWFEZIR/b5+M/R0SswMB1DZRc0TFVYWLa4uBEXFUNGRe/y8szNziwwMB1DZFRXWLa3uBAWFe/z8svMzSsvMLa4uREXFkRGRvDz88vNzVVXWLi6uhAUE0JFRPD09M7P0CktLTs9Pb/FxYmMjAQGBiosLK2ysaCiohUXFzyg/TmO2xw8VgEBAQQFBgMEBAQFBQYHBwQEBCFNckCq/z2f9ipjkwYIChIlMzN5tzuf+zqX5ythjhQpPBAlOBAmORAmOBAlNxo1TTFyqjqd+EGn/0Ck+EGk+UGk+kCk+UGl+zyj/zqc+Dud+jud+jyd+Dud+Dyi/zqd9zqc9jyf+zqd+Tic+Dmc9Due+Tyh/jud+Tuf+Cuq/zud9zyd+Duf/Dyh/Tyg/Dug/Dug/Tyg/Tyf+zuc+D+c+jOZ/zmg9zmd9zud+Due+jqd+Tud+Tuc+juc+Dqc9Tyc9Fro8bMAAADfdFJOUwAKPISvsrKys6yBNgYHVdj//////9NQA0LW//7//////9k/lP//nb7//77GvsT//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8TEtv+9jf/9lUPU/85FBlvS+Pv7+/v7+NBdBUOXubq5ubq3mkjoNDx5AAAACXBIWXMAAA7DAAAOwwHHb6hkAAABwUlEQVQ4T2NgYGRiZmFlAwF2VhTAwcnFzcPAwMvHLyAoJAgGQqhAWERUTJxBQlJKWgYKZFGBnLyCohKDsgqUiw2oyqsxqGtAOViBphaDliaUjRVoajPo4FegCzFBT98AExiqwhXoGRmbmKIBEzNzCz2oAksraxtbO3Rg7+DoBFHg7OLq5o4FeHh6eYMV+Pj6gQX8AwLBtHtQcEgoiA4Lj4jUBfoiKjoGLB4bF58AZiQmJaeA6NS0dKACLc2ojEyweFZ2Ti6YkZdfUAiiU4tgCorB4iXZpWVgRnlFZRWITq1GVVCTXVsHZpTXNzSCaHQFJdlNzWBGS2sbxAo0Be3ZHZ1gRld3Ty+IBirwBvsC6si+/gkTwYxJk6dMBdEeUBOmTZ8BFp85azaYdnefMxdMzZu/AKxAfuGixWABNJC6ZCkkJGWXLV+xctVqNLBm7br1KhugsamqsHHT5s1bUMDWbRu37wBFFiTBODs770QHzqAEswtsAm6guZuQAl2GPXhT9d59DPsjgUkPFzhw8BDD4SNHfVRxgAM+x44znDh56vSZs0BwDh2cv3Dx0mUGBoYrV69dv3Hz5s1b6OD2nbv3GBgAt7keqNrw6tEAAAAASUVORK5CYII=',
+
+            //왼편 확장 대표 아이콘 : base64 인코딩
+            // blockIconURI: iconURI, // 아이콘 URI
+            // blockIconURI: 'data:image/svg+xml;base64,PHN2ZyB2aW... [긴 SVG 문자열]', // 예시 코드
+            // blockIconURI: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIxNy41IiBmaWxsPSIjRkY2Njg4Ii8+PHRleHQgZmlsbD0iI0ZGRiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjI0IiB4PSIxMiIgeT0iMjgiPlM8L3RleHQ+PC9zdmc+',
+            // blockIconURI: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB0AAAAcCAYAAACdz7SqAAAABHNCSVQICAgIfAhkiAAAAAFzUkdCAK7OHOkAAAAEZ0FNQQAAsY8L/GEFAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAxJJREFUSEu9l01oE0EUx/+zm22atlSrtiC0FEWstH6AiJciKh40pRc9pJ4sCOJFpApCwYN3T1o9GjwXRfyAUsST14AIniqKUKjWgtWkpslmszu+tzv52M3GxsT2l0x25u3O/Pe9+YyQxPtlB1deWlizJCICkPQBKFONZFszSFj0e26vgZm44VrEu6+2nHhSwI4YoGssFCLIhJgagbxyW8yYAkO7gKeJKMRoMictG4jootl2N4ZUWXo1B9w5FYG2kgUM8nDTBBlqXAiBrjbg9WcJzdA841agk9a3NRJV5S1DI8UaUbfb+csDoMXktaMarkIMP8zJnpjg++4TeqQd6KBQUPxbxaYBaq9TxjSpT4GiI7GzQ/NEt5OoIFURi8JZSuFL8iqyq2kIjkWTsKed7QYGLkwjNjoJK23CJltZlD2FbkDPLODt9WFV7f9x/EYSbUcvw8rnXVHlioRo07A0d88rhjCeSKhcOGfiZ9HevU2V/Hx6dhcGdVmpf8vx45jbdlGV/MwkH+HV7CzGL4YL9+8ZxJu5eaRSKWXxQy75hqy/00R4H9oFXj1pEeE3C4MnIGEVTfcaJFgrXCWIios7DcJQ5rr3AzQmWuYfH69DQ62Upo5WJ7yauzvx/cZeyv9UnfDkaagz6zme6bX8SqfdK81A91pDoF2fqMErRAjTU1MYPDCE+ecvlMVPZuUHdg/248jIiLIEkI5PV4kKOAWg98QlrxjC4sJHlQtneXFJ5WoZOD2JYlWQKp5aJvT9J3Hs5mN0x2h1IhMfXfiA0UyKUIpR64cSt9Bz/jZsXn/JxlSWQYZCIKJRGN1UiWr5gl2nu1zCe8UNqZkBnHUWpLMSlXt9a28Z3pZU1oXv1Wl1Q7x2hTtWBCzaZfoqa281tOPQ1KgkWsSobnOJ63qCJbikeT78zROu0GoqIWA7NjTH8WK/FTgc3i4dWl+npB29+m02B3bsN03LsX3Up/fjUfzM08iygwPIg00tJ/rJFCQO9wlMHIzwAVzKD98dXJuzsJz1/lZUw5VagevzYT5OHj4Y44MX8AckpVAZykJ1kwAAAABJRU5ErkJggg==',
+            // blockIconURI: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAfCAMAAACxiD++AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAKdUExURQAAADOZ5jyZ9zye9zyg+zyf+zuf+Tyf+Tyg+zug+zee+Tmc9lWq/0mS/zyc+Tud+UCs/z+n/z+m/z6n/z2m/zqc+Dmc+VWq/zqe9zyd+j6m/zud+Dud9zud+Duc9zue+T6k/zuc+Dma8zmb+D6l/zue+jyc9Tud+j2j/z2i/zud+Dud+juc+Dud+Duf+jyh/T2h/Tyg/Dye9juZ6TqW5TqX5TuX5Tya7Due+Dyf+juX6i9upBw/XxY1URY2Uxg3UyNJbTR8vT2g+jud+T2g+C1roQsSGAAAAAIAABgvQTaAwDyh/zyf/DmR4Bs/WwoKCiUpKB0gIAgICCQmJSImJQIDAwQFBCRQdECp/z2h/zyg/jaI0hczSkBCQ83S04+TlAQIBzI0M73Av6KlpRcbHAEAABxCY0Gs/zaI0xc0S1hbXP///7m7uxAWFEZIR/b5+M/R0SswMB1DZRc0TFVYWLa4uBEXFUNGRe/y8szNziwwMB1DZFRXWLa3uBAWFe/z8svMzSsvMLa4uREXFkRGRvDz88vNzVVXWLi6uhAUE0JFRPD09M7P0CktLTs9Pb/FxYmMjAQGBiosLK2ysaCiohUXFzyg/TmO2xw8VgEBAQQFBgMEBAQFBQYHBwQEBCFNckCq/z2f9ipjkwYIChIlMzN5tzuf+zqX5ythjhQpPBAlOBAmORAmOBAlNxo1TTFyqjqd+EGn/0Ck+EGk+UGk+kCk+UGl+zyj/zqc+Dud+jud+jyd+Dud+Dyi/zqd9zqc9jyf+zqd+Tic+Dmc9Due+Tyh/jud+Tuf+Cuq/zud9zyd+Duf/Dyh/Tyg/Dug/Dug/Tyg/Tyf+zuc+D+c+jOZ/zmg9zmd9zud+Due+jqd+Tud+Tuc+juc+Dqc9Tyc9Fro8bMAAADfdFJOUwAKPISvsrKys6yBNgYHVdj//////9NQA0LW//7//////9k/lP//nb7//77GvsT//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8TEtv+9jf/9lUPU/85FBlvS+Pv7+/v7+NBdBUOXubq5ubq3mkjoNDx5AAAACXBIWXMAAA7DAAAOwwHHb6hkAAABwUlEQVQ4T2NgYGRiZmFlAwF2VhTAwcnFzcPAwMvHLyAoJAgGQqhAWERUTJxBQlJKWgYKZFGBnLyCohKDsgqUiw2oyqsxqGtAOViBphaDliaUjRVoajPo4FegCzFBT98AExiqwhXoGRmbmKIBEzNzCz2oAksraxtbO3Rg7+DoBFHg7OLq5o4FeHh6eYMV+Pj6gQX8AwLBtHtQcEgoiA4Lj4jUBfoiKjoGLB4bF58AZiQmJaeA6NS0dKACLc2ojEyweFZ2Ti6YkZdfUAiiU4tgCorB4iXZpWVgRnlFZRWITq1GVVCTXVsHZpTXNzSCaHQFJdlNzWBGS2sbxAo0Be3ZHZ1gRld3Ty+IBirwBvsC6si+/gkTwYxJk6dMBdEeUBOmTZ8BFp85azaYdnefMxdMzZu/AKxAfuGixWABNJC6ZCkkJGWXLV+xctVqNLBm7br1KhugsamqsHHT5s1bUMDWbRu37wBFFiTBODs770QHzqAEswtsAm6guZuQAl2GPXhT9d59DPsjgUkPFzhw8BDD4SNHfVRxgAM+x44znDh56vSZs0BwDh2cv3Dx0mUGBoYrV69dv3Hz5s1b6OD2nbv3GBgAt7keqNrw6tEAAAAASUVORK5CYII=',
+
+            blockIconURI: 'data:image/png;base64,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',
 
             blocks: [
 
@@ -504,24 +510,24 @@ class Scratch3Esp32Bluetooth {
                     blockType: BlockType.COMMAND,
                     text: Form_disconnectPort[theLocale],
                 },
-                {
-                    opcode: 'getConnectState',
-                    blockType: BlockType.REPORTER,
-                    text: Form_getConnectState[theLocale],
-                    arguments: {}
-                },
-                '---',
-                {
-                    opcode: 'toggleNotify',
-                    blockType: BlockType.COMMAND,
-                    text: '데이터 알림 [STATE] 설정',
-                    arguments: {
-                        STATE: {
-                            type: ArgumentType.STRING,
-                            menu: 'notifyMenu'
-                        }
-                    }
-                },
+                // {
+                //     opcode: 'getConnectState',
+                //     blockType: BlockType.REPORTER,
+                //     text: Form_getConnectState[theLocale],
+                //     arguments: {}
+                // },
+                // '---',
+                // {
+                //     opcode: 'toggleNotify',
+                //     blockType: BlockType.COMMAND,
+                //     text: '데이터 알림 [STATE] 설정',
+                //     arguments: {
+                //         STATE: {
+                //             type: ArgumentType.STRING,
+                //             menu: 'notifyMenu'
+                //         }
+                //     }
+                // },
                 '---',
 
                 //-------------------------------------------//
@@ -935,7 +941,7 @@ class Scratch3Esp32Bluetooth {
                         },
                         LINE_TIME: {
                             type: ArgumentType.NUMBER,
-                            defaultValue: 0,
+                            defaultValue: 1,
                             acceptReporters: true,
                         },
                     }
@@ -952,7 +958,7 @@ class Scratch3Esp32Bluetooth {
                         },
                         LINE_DISTANCE: {
                             type: ArgumentType.NUMBER,
-                            defaultValue: 0,
+                            defaultValue: 5,
                             acceptReporters: true,
                         },
                     }
@@ -1398,12 +1404,13 @@ class Scratch3Esp32Bluetooth {
     // ===============================================
 
         groupConnect(args){
+            this._openConfig();
             //this._openConfig();
             // vm.connectionStatus = "no";
             // vm.emit('CONNECTION_STATUS', vm.connectionStatus);
          //   this.connectionAlive = newStatus;
-            var newStatus ="ok"
-            this.runtime.emit('CONNECTION_STATUS', newStatus);
+            // var newStatus ="ok"
+            // this.runtime.emit('CONNECTION_STATUS', newStatus);
         }
 
         connectPort(args){
@@ -1419,19 +1426,13 @@ class Scratch3Esp32Bluetooth {
         }
 
         groupLED(args){
-
-            var newStatus ="no"
-            this.runtime.emit('CONNECTION_STATUS', newStatus);
-
-
+            // var newStatus ="no"
+            // this.runtime.emit('CONNECTION_STATUS', newStatus);
         }
 
         groupDisplay(args){
-
-            var newStatus ="loading"
-            this.runtime.emit('CONNECTION_STATUS', newStatus);
-
-
+            // var newStatus ="loading"
+            // this.runtime.emit('CONNECTION_STATUS', newStatus);
         }
 
         groupText(args){
@@ -1685,11 +1686,54 @@ class Scratch3Esp32Bluetooth {
 
 
     // ===============================================
+    // 개별 블록 함수 (동작 상태 확인 함수)
+    // ===============================================
+
+    waitForStatusChange() {
+        var seq = 0;
+        return new Promise(resolve => {
+            // 1. 상태를 확인하는 함수 정의 (주기적인 확인 필요)
+            const checkStatus = () => {
+                // this.reqPSTAT 값이 0이 아니면
+
+                if(seq == 0)
+                {
+                    if (this.reqPSTAT !== 0) {
+                        seq = 1;
+                        // clearInterval(intervalId); // 2. 타이머를 멈추고
+                        // resolve(this.reqPSTAT); // 3. 대기를 완료합니다.
+                    } else {
+                        // 아직 0이면 계속 기다립니다.
+                        // 이 코드가 주 실행 스레드를 막지 않으면서 주기적으로 상태를 확인합니다.
+                    }
+                }
+                else if(seq == 1)
+                {
+                    if (this.reqPSTAT !== 1) {
+                        clearInterval(intervalId); // 2. 타이머를 멈추고
+                        resolve(this.reqPSTAT); // 3. 대기를 완료합니다.
+                        console.log("wait PSTAT checked");
+                    } else {
+                        // 아직 0이면 계속 기다립니다.
+                        // 이 코드가 주 실행 스레드를 막지 않으면서 주기적으로 상태를 확인합니다.
+                    }
+                }
+
+
+            };
+
+            // 4. 짧은 간격(예: 50ms)으로 상태를 주기적으로 확인하는 타이머 시작
+            // (참고: 상태 업데이트가 '이벤트 리스너'로 구현되어 있다면, setInterval 대신 이벤트 리스너를 사용하는 것이 더 효율적입니다.)
+            const intervalId = setInterval(checkStatus, 50);
+        });
+    }
+
+    // ===============================================
     // 개별 블록 함수 (move 역할)
     // ===============================================
 
     //지정된 거리만큼 주미를 전진시킵니다.
-    move_dist(args)
+    async move_dist(args)
     {
         let speed = parseInt(args.MOVE_SPEED);
         let dir = parseInt(args.MOVE_DIRECTION);
@@ -1710,10 +1754,15 @@ class Scratch3Esp32Bluetooth {
             dist,
             dir
         );
+
+        if(this.actionMode == 0)
+        {
+            await this.waitForStatusChange();
+        }
     }
 
     // 빠르게 지정된 거리 만큼 이동
-    move_dist_quick(args) {
+    async move_dist_quick(args) {
 
         let dir = parseInt(args.MOVE_DIRECTION);
         let dist = parseInt(args.MOVE_DIST);
@@ -1739,6 +1788,10 @@ class Scratch3Esp32Bluetooth {
             );
         }
 
+        if(this.actionMode == 0)
+        {
+            await this.waitForStatusChange();
+        }
     }
 
 
@@ -1749,7 +1802,7 @@ class Scratch3Esp32Bluetooth {
      * @param {object} args - { DIRECTION: string (0|1), DEGREE: number, SPEED: string (1|2|3) }
      */
 
-    turn_angle(args) {
+    async turn_angle(args) {
 
         let dir = parseInt(args.TURN_DIRECTION); // 0 (왼쪽) 또는 1 (오른쪽)
         let deg = Math.round(parseFloat(args.TURN_ANGLE)); // 각도는 정수화
@@ -1781,10 +1834,16 @@ class Scratch3Esp32Bluetooth {
             degHigh,
             dir
         );
+
+
+        if(this.actionMode == 0)
+        {
+            await this.waitForStatusChange();
+        }
     }
 
     // 빠르게 지정된 각도만큼 회전
-    turn_angle_quick(args) {
+    async turn_angle_quick(args) {
 
         let dir = parseInt(args.TURN_DIRECTION); // 0 (왼쪽) 또는 1 (오른쪽)
         let deg = Math.round(parseFloat(args.TURN_ANGLE)); // 각도는 정수화
@@ -1809,6 +1868,11 @@ class Scratch3Esp32Bluetooth {
                 CommandType.COMMAND_QUICK_RIGHT,
                 deg,
             );
+        }
+
+        if(this.actionMode == 0)
+        {
+            await this.waitForStatusChange();
         }
     }
 
@@ -2748,6 +2812,8 @@ class Scratch3Esp32Bluetooth {
             this.isLoopRunning = true;
             console.log("Starting " + this.sendingLoopTime + "ms sending loop...");
 
+            this.setNotify();
+
             // 첫 호출 시 바로 실행하고, 재귀적으로 setTimeout을 사용하여 주기를 제어
             this.sendingLoop();
         }
@@ -2971,32 +3037,65 @@ class Scratch3Esp32Bluetooth {
          * @param {object} args - STATE ('활성화' 또는 '비활성화')
          * @returns {Promise<void>}
          */
-        async toggleNotify(args) {
+        // async toggleNotify(args) {
+        //     if (!this.characteristic) {
+        //         console.error('Notify를 설정할 Characteristic이 없습니다. 먼저 장치에 연결하세요.');
+        //         return;
+        //     }
+
+        //     const state = args.STATE.toLowerCase();
+
+        //     try {
+        //         if (state === '활성화' && !this.isNotifying) {
+        //             await this.characteristic.startNotifications();
+        //             this.isNotifying = true;
+        //             console.log('🔔 BLE Notify 활성화 완료.');
+        //         } else if (state === '비활성화' && this.isNotifying) {
+        //             await this.characteristic.stopNotifications();
+        //             this.isNotifying = false;
+        //             console.log('🔕 BLE Notify 비활성화 완료.');
+        //         } else {
+        //             console.log(`Notify 상태가 이미 ${state}입니다.`);
+        //         }
+        //     } catch (error) {
+        //         console.error('Notify 설정 중 오류 발생:', error);
+        //         return Promise.reject(`Notify 설정 실패: ${error.message}`);
+        //     }
+        // }
+        async setNotify() {
             if (!this.characteristic) {
                 console.error('Notify를 설정할 Characteristic이 없습니다. 먼저 장치에 연결하세요.');
                 return;
             }
 
-            const state = args.STATE.toLowerCase();
+           // const state = args.STATE.toLowerCase();
 
             try {
-                if (state === '활성화' && !this.isNotifying) {
-                    await this.characteristic.startNotifications();
-                    this.isNotifying = true;
-                    console.log('🔔 BLE Notify 활성화 완료.');
-                } else if (state === '비활성화' && this.isNotifying) {
-                    await this.characteristic.stopNotifications();
-                    this.isNotifying = false;
-                    console.log('🔕 BLE Notify 비활성화 완료.');
-                } else {
-                    console.log(`Notify 상태가 이미 ${state}입니다.`);
-                }
-            } catch (error) {
+                await this.characteristic.startNotifications();
+                this.isNotifying = true;
+                console.log('🔔 BLE Notify 활성화 완료.');
+
+                // if (state === '활성화' && !this.isNotifying) {
+                //     await this.characteristic.startNotifications();
+                //     this.isNotifying = true;
+                //     console.log('🔔 BLE Notify 활성화 완료.');
+                // }
+                // else if (state === '비활성화' && this.isNotifying)
+                // {
+                //     await this.characteristic.stopNotifications();
+                //     this.isNotifying = false;
+                //     console.log('🔕 BLE Notify 비활성화 완료.');
+                // }
+                // else
+                // {
+                //     console.log(`Notify 상태가 이미 ${state}입니다.`);
+                // }
+            }
+            catch (error) {
                 console.error('Notify 설정 중 오류 발생:', error);
                 return Promise.reject(`Notify 설정 실패: ${error.message}`);
             }
         }
-
 
 
         // // -----------------------------------------------------
@@ -3055,6 +3154,84 @@ class Scratch3Esp32Bluetooth {
 
 
 
+
+openConfig() {
+    this._openConfig();
+}
+
+_openConfig() {
+    // 이미 열려있으면 삭제
+    const oldModal = document.getElementById('zumi-config-modal');
+    if (oldModal) oldModal.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'zumi-config-modal';
+    modal.style = `
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    `;
+
+    modal.innerHTML = `
+        <div style="
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            width: 320px;
+            font-size: 16px;
+        ">
+            <h3>${Zumi_Config.title[theLocale]}</h3>
+
+            <!--
+            <div style="text-align:center; margin-bottom:10px;">
+                <img src="data:image/png;base64,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"
+                    width="100" height="100">
+            </div>
+            -->
+<!--
+            <label>통신 간격 선택</label><br>
+            <select id="esp32-port-select" style="width:100%; margin-bottom: 10px;">
+                <option>100 ms</option>
+                <option>150 ms</option>
+                <option>200 ms</option>
+            </select>
+-->
+            <label>${Zumi_Config.actionMode[theLocale]}</label><br>
+
+            <select id="esp32-mode" style="width:100%; margin-bottom: 10px;">
+                <option value="0">${Zumi_Config.modeSequential[theLocale]}</option>
+                <option value="1">${Zumi_Config.modeImmediate[theLocale]}</option>
+            </select>
+
+
+            <div style="margin-top: 15px; text-align:right;">
+                <button id="esp32-save-btn">${Zumi_Config.save[theLocale]}</button>
+                <button id="esp32-close-btn">${Zumi_Config.close[theLocale]}</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // 닫기 버튼 이벤트
+    document.getElementById('esp32-close-btn').onclick = () => modal.remove();
+
+    // 저장 버튼 이벤트
+    document.getElementById('esp32-save-btn').onclick = () => {
+      //  this.testMode = document.getElementById('esp32-port-select').value;
+       // this.actionMode = document.getElementById('esp32-mode').value;
+        this.actionMode = Number(
+            document.getElementById('esp32-mode').value
+        );
+        console.log('Saved config:',this.actionMode);
+
+        modal.remove();
+    };
+}
 
 
 
