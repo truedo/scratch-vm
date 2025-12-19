@@ -49,6 +49,13 @@ const {
 
 
     Form_getIRSensorReading,
+
+    Form_IRSensorReading_FL,
+    Form_IRSensorReading_FR,
+    Form_IRSensorReading_BL,
+    Form_IRSensorReading_BC,
+    Form_IRSensorReading_BR,
+
     Form_getBatReading,
     Form_getBtnReading,
     Form_boolean_getBtnReading,
@@ -306,6 +313,10 @@ const PacketIndex = {
     DATA_DETECT_CAT_Y: 25
 };
 
+const ActionMode = {
+    MODE_SEQUENTIAL: 0,
+    MODE_IMMEDIATE: 1
+};
 
 class Scratch3Esp32Bluetooth {
 
@@ -318,8 +329,10 @@ class Scratch3Esp32Bluetooth {
 
     constructor (runtime) {
 
+        this.checkedSendLoop = 0;
+
         this.testMode = 0;
-        this.actionMode = 0;
+        this.actionMode = ActionMode.MODE_SEQUENTIAL;
 
         this.characteristic = null;
         this.device = null;
@@ -985,6 +998,42 @@ class Scratch3Esp32Bluetooth {
                     text: Form_groupSensors[theLocale],
                 },
 
+                { // 센서 FL
+                    opcode: 'IRSensorReading_FL',
+                    blockType: BlockType.REPORTER,
+                    text: Form_IRSensorReading_FL[theLocale],
+                    arguments: {
+                    }
+                },
+                { // 센서 FR
+                    opcode: 'IRSensorReading_FR',
+                    blockType: BlockType.REPORTER,
+                    text: Form_IRSensorReading_FR[theLocale],
+                    arguments: {
+                    }
+                },
+                { // 센서 BL
+                    opcode: 'IRSensorReading_BL',
+                    blockType: BlockType.REPORTER,
+                    text: Form_IRSensorReading_BL[theLocale],
+                    arguments: {
+                    }
+                },
+                { // 센서 BR
+                    opcode: 'IRSensorReading_BR',
+                    blockType: BlockType.REPORTER,
+                    text: Form_IRSensorReading_BR[theLocale],
+                    arguments: {
+                    }
+                },
+                { // 센서 BC
+                    opcode: 'IRSensorReading_BC',
+                    blockType: BlockType.REPORTER,
+                    text: Form_IRSensorReading_BC[theLocale],
+                    arguments: {
+                    }
+                },
+
                 { // 센서 값
                     opcode: 'getIRSensorReading',
                     blockType: BlockType.REPORTER,
@@ -1448,6 +1497,133 @@ class Scratch3Esp32Bluetooth {
         }
 
 
+
+    // ===============================================
+    // 개별 블록 함수 (동작 상태 확인 함수)
+    // ===============================================
+
+    // 공용으로 사용할 조건 대기 함수
+    waitForCondition(conditionFn, timeout = null) {
+        return new Promise((resolve) => {
+            const startTime = Date.now();
+            const checkTimer = setInterval(() => {
+                if (conditionFn()) {
+                    clearInterval(checkTimer);
+                    resolve(true);
+                } else if (timeout && (Date.now() - startTime) > timeout) {
+                    clearInterval(checkTimer);
+                    resolve(false); // 시간 초과
+                }
+            }, 50); // 50ms마다 상태 체크
+        });
+    }
+
+    async sendAndAwaitZumi(mode, command, ...args) {
+        const MAX_RETRIES = 5;      // 최대 재전송 횟수
+        const START_TIMEOUT = 250; // 명령 시작(1이 되기까지) 대기 시간 (1초)
+        console.log(`- 명령 시작`);
+        for (let i = 0; i < MAX_RETRIES; i++) {
+            console.log(`명령 전송 시도 (${i + 1}/${MAX_RETRIES})...`);
+
+            this.sendCommand(command, ...args);
+
+            // 1. 명령이 시작되었는지(reqPSTAT == 1) 확인하는 타임아웃 로직
+            const started = await this.waitForCondition(() => this.reqPSTAT !== 0, START_TIMEOUT);
+
+            if (started)
+            {
+                if(mode == ActionMode.MODE_SEQUENTIAL)
+                {
+                    console.log("명령 수신 확인 (Zumi 구동 시작)");
+                    // 2. 이제 명령이 끝날 때까지(reqPSTAT == 0) 무제한 대기
+                    await this.waitForCondition(() => this.reqPSTAT === 0);
+                    console.log("* 명령 수행 완료");
+                    return ; // 성공적으로 완료됨
+                }
+                else
+                {
+                    console.log("* 명령 수행 완료");
+                    return ; // 성공적으로 완료됨
+                }
+            }
+
+            console.warn("명령 전송 실패 또는 응답 없음. 재시도합니다...");
+        }
+
+        console.error("* 최대 재시도 횟수를 초과했습니다. 통신 상태를 확인하세요.");
+        return ;
+    }
+
+
+    // pstat이 변경되지 않는 명령들을 sendingloop에서 전송을 완료하는게 목적
+    async waitForSendLoopCheck(mode, command, ...args) {
+        const MAX_RETRIES = 5;      // 최대 재전송 횟수
+        const START_TIMEOUT = 100; // 명령 시작(1이 되기까지) 대기 시간 (1초)
+
+        this.checkedSendLoop = 1;
+        this.sendCommand(command, ...args);
+        console.log(`- 명령 시작`);
+        if(mode ==  ActionMode.MODE_SEQUENTIAL)
+        {
+            for (let i = 0; i < MAX_RETRIES; i++) {
+                console.log(`sendingloop 기다리기 (${i + 1}/${MAX_RETRIES})...`);
+
+            // this.sendCommand(command, ...args);
+
+                // 1. 명령이 시작되었는지(reqPSTAT == 1) 확인하는 타임아웃 로직
+                const started = await this.waitForCondition(() => this.checkedSendLoop !== 1, START_TIMEOUT);
+                if (started)
+                {
+                    console.log("* sendingloop 전송 완료");
+                    return ; // 성공적으로 완료됨
+                }
+
+                console.warn("* sendingloop 실패 또는 응답 없음. 재시도합니다...");
+            }
+            console.error("* sendingloop 횟수를 초과했습니다. 통신 상태를 확인하세요.");
+            return ;
+        }
+        // else
+        // {
+        //     return true;
+        // }
+    }
+
+
+    // pstat이 변경되지 않는 명령들을 sendingloop에서 전송을 완료하는게 목적
+    async waitForSendLoopCheck_text(mode, payloadBytes) {
+        const MAX_RETRIES = 5;      // 최대 재전송 횟수
+        const START_TIMEOUT = 100; // 명령 시작(1이 되기까지) 대기 시간 (1초)
+
+        this.checkedSendLoop = 1;
+        this.makePacket(payloadBytes);
+        console.log(`- 명령 시작`);
+        if(mode ==  ActionMode.MODE_SEQUENTIAL)
+        {
+            for (let i = 0; i < MAX_RETRIES; i++) {
+                console.log(`sendingloop 기다리기 (${i + 1}/${MAX_RETRIES})...`);
+
+            // this.sendCommand(command, ...args);
+
+                // 1. 명령이 시작되었는지(reqPSTAT == 1) 확인하는 타임아웃 로직
+                const started = await this.waitForCondition(() => this.checkedSendLoop !== 1, START_TIMEOUT);
+                if (started)
+                {
+                    console.log("* sendingloop 전송 완료");
+                    return ; // 성공적으로 완료됨
+                }
+
+                console.warn("* sendingloop 실패 또는 응답 없음. 재시도합니다...");
+            }
+            console.error("* sendingloop 횟수를 초과했습니다. 통신 상태를 확인하세요.");
+            return ;
+        }
+        // else
+        // {
+        //     return true;
+        // }
+    }
+
     // ===============================================
     // 개별 블록 함수 (LED)
     // ===============================================
@@ -1467,7 +1643,8 @@ class Scratch3Esp32Bluetooth {
         const g10 = Math.round(g255 * (10 / 255));
         const b10 = Math.round(b255 * (10 / 255));
 
-        this.sendCommand(
+        return this.waitForSendLoopCheck(
+            this.actionMode,
             CommandType.COMMAND_LED,
             r10,
             g10,
@@ -1480,7 +1657,13 @@ class Scratch3Esp32Bluetooth {
         const r = parseInt(args.R_VALUE);
         const g = parseInt(args.G_VALUE);
         const b = parseInt(args.B_VALUE);
-        this.sendCommand(CommandType.COMMAND_LED, r, g, b);
+        return this.waitForSendLoopCheck(
+            this.actionMode,
+            CommandType.COMMAND_LED,
+            r,
+            g,
+            b
+        );
     }
 
     ledPattern(args){
@@ -1503,7 +1686,8 @@ class Scratch3Esp32Bluetooth {
             timeLow = timeInMs % 256;              // 하위 바이트 (나머지)
         }
 
-        this.sendCommand(
+        return this.waitForSendLoopCheck(
+            this.actionMode,
             CommandType.COMMAND_PATTERN_LED, // 통신 명령 코드
             pattern,             // LED 패턴 값 (0~6)
             timeHigh,            // 시간 상위 바이트
@@ -1517,14 +1701,16 @@ class Scratch3Esp32Bluetooth {
     // ===============================================
 
     play_sound_command(args) {
-        this.sendCommand(
+        return this.waitForSendLoopCheck(
+            this.actionMode,
             CommandType.COMMAND_PLAY_SOUND,
             args.NOTE
         );
     }
 
     change_emotion_command(args) {
-        this.sendCommand(
+        return this.waitForSendLoopCheck(
+            this.actionMode,
             CommandType.COMMAND_EMOTION_CHANGE,
             args.EMOTION
         );
@@ -1535,8 +1721,8 @@ class Scratch3Esp32Bluetooth {
         if (args.STATE === 'camera') {
             cameraON = 1
         }
-
-        this.sendCommand(
+        return this.waitForSendLoopCheck(
+            this.actionMode,
             CommandType.COMMAND_SCREEN_TOGGLE,
             cameraON
         );
@@ -1584,7 +1770,8 @@ class Scratch3Esp32Bluetooth {
         const size = args.TEXT_SIZE_VALUE;   // 텍스트 크기 (0-5)
         const usePos = 0;         // 위치 설정 안함 (0)
 
-        this.sendCommand(
+        return this.waitForSendLoopCheck(
+            this.actionMode,
             CommandType.COMMAND_TEXT_SET,
             color,
             size,
@@ -1644,7 +1831,9 @@ class Scratch3Esp32Bluetooth {
         buf1 |= usePos_bit << 7;
 
         // color와 size는 0으로 고정하여 좌표 설정 명령만 전달합니다.
-        this.sendCommand(
+
+        return this.waitForSendLoopCheck(
+            this.actionMode,
             CommandType.COMMAND_TEXT_SET,
             0,
             0,
@@ -1681,7 +1870,11 @@ class Scratch3Esp32Bluetooth {
 
         const final_bytes = new Uint8Array(final_bytes_array);
 
-        this.makePacket(final_bytes);
+        //this.makePacket(final_bytes);
+       return this.waitForSendLoopCheck_text(
+                this.actionMode,
+                final_bytes
+            );
     }
 
 
@@ -1693,6 +1886,8 @@ class Scratch3Esp32Bluetooth {
         var seq = 0;
         return new Promise(resolve => {
             // 1. 상태를 확인하는 함수 정의 (주기적인 확인 필요)
+
+            console.log("wait PSTAT start");
             const checkStatus = () => {
                 // this.reqPSTAT 값이 0이 아니면
 
@@ -1728,6 +1923,7 @@ class Scratch3Esp32Bluetooth {
         });
     }
 
+
     // ===============================================
     // 개별 블록 함수 (move 역할)
     // ===============================================
@@ -1748,17 +1944,14 @@ class Scratch3Esp32Bluetooth {
         if(dir < 0) {dir = 0};
         if(dir > 1) {dir = 1};
 
-        this.sendCommand(
-            CommandType.COMMAND_GO_UNTIL_DIST,
-            speed,
-            dist,
-            dir
-        );
 
-        if(this.actionMode == 0)
-        {
-            await this.waitForStatusChange();
-        }
+        return this.sendAndAwaitZumi(
+                    this.actionMode,
+                    CommandType.COMMAND_GO_UNTIL_DIST,
+                    speed,
+                    dist,
+                    dir
+                );
     }
 
     // 빠르게 지정된 거리 만큼 이동
@@ -1775,22 +1968,19 @@ class Scratch3Esp32Bluetooth {
 
         if(dir == 0)
         {
-            this.sendCommand(
-                CommandType.COMMAND_QUICK_GOGO,
-                dist,
-            );
+            return this.sendAndAwaitZumi(
+                    this.actionMode,
+                    CommandType.COMMAND_QUICK_GOGO,
+                    dist,
+                );
         }
         else
         {
-            this.sendCommand(
-                CommandType.COMMAND_QUICK_GOBACK,
-                dist,
-            );
-        }
-
-        if(this.actionMode == 0)
-        {
-            await this.waitForStatusChange();
+            return this.sendAndAwaitZumi(
+                    this.actionMode,
+                    CommandType.COMMAND_QUICK_GOBACK,
+                    dist,
+                );
         }
     }
 
@@ -1827,19 +2017,14 @@ class Scratch3Esp32Bluetooth {
             degLow = deg % 256;              // 하위 바이트 (나머지)
         }
 
-        this.sendCommand(
-            CommandType.COMMAND_FREE_TURN_PYTHON,
-            speed,
-            degLow,
-            degHigh,
-            dir
-        );
-
-
-        if(this.actionMode == 0)
-        {
-            await this.waitForStatusChange();
-        }
+        return this.sendAndAwaitZumi(
+                    this.actionMode,
+                    CommandType.COMMAND_FREE_TURN_PYTHON,
+                    speed,
+                    degLow,
+                    degHigh,
+                    dir
+                );
     }
 
     // 빠르게 지정된 각도만큼 회전
@@ -1857,22 +2042,19 @@ class Scratch3Esp32Bluetooth {
 
         if(dir == 0)
         {
-            this.sendCommand(
-                CommandType.COMMAND_QUICK_LEFT,
-                deg,
-            );
+            return this.sendAndAwaitZumi(
+                        this.actionMode,
+                        CommandType.COMMAND_QUICK_LEFT,
+                        deg,
+                    );
         }
         else
         {
-            this.sendCommand(
-                CommandType.COMMAND_QUICK_RIGHT,
-                deg,
-            );
-        }
-
-        if(this.actionMode == 0)
-        {
-            await this.waitForStatusChange();
+            return this.sendAndAwaitZumi(
+                        this.actionMode,
+                        CommandType.COMMAND_QUICK_RIGHT,
+                        deg,
+                    );
         }
     }
 
@@ -1892,12 +2074,13 @@ class Scratch3Esp32Bluetooth {
         if(senR < 0) senR = 0
         if(senR > 255) senR = 255
 
-        this.sendCommand(
-            CommandType.COMMAND_GOSENSOR,
-            speed,
-            senL,
-            senR
-        );
+        return this.sendAndAwaitZumi(
+                this.actionMode,
+                CommandType.COMMAND_GOSENSOR,
+                speed,
+                senL,
+                senR
+            );
     }
 
     // 지정된 속도와 방향으로 주미가 계속 이동하도록 명령
@@ -1912,7 +2095,8 @@ class Scratch3Esp32Bluetooth {
         if(dir < 0) {dir = 0};
         if(dir > 1) {dir = 1};
 
-        this.sendCommand(
+        return this.waitForSendLoopCheck(
+            this.actionMode,
             CommandType.COMMAND_GO_INFINITE,
             speed,
             0,
@@ -1985,6 +2169,11 @@ class Scratch3Esp32Bluetooth {
 
         if(dirL < 0) dirL = 0;
         if(dirL > 2) dirL = 2;
+
+        // 오른쪽 모터 반대
+        if(dirL == 1) dirL = 2;
+        else if(dirL == 2) dirL = 1;
+
         if(dirR < 0) dirR = 0;
         if(dirR > 2) dirR = 2;
 
@@ -1992,15 +2181,14 @@ class Scratch3Esp32Bluetooth {
         dir = dir | dirL;
         dir = dir | (dirR<<4);
 
-        this.sendCommand(
-            CommandType.COMMAND_MOTOR_TIME,
-            speedL,
-
-            speedR,
-            dir,
-            time
-        );
-
+        return this.sendAndAwaitZumi(
+                    this.actionMode,
+                    CommandType.COMMAND_MOTOR_TIME,
+                    speedL,
+                    speedR,
+                    dir,
+                    time
+                );
     }
 
     // 라인 감지 센서를 이용하여 라인을 따라 주미가 이동
@@ -2028,14 +2216,15 @@ class Scratch3Esp32Bluetooth {
         if(time < 0) time = 0;
         if(time > 250) time = 250;
 
-        this.sendCommand(
-            CommandType.COMMAND_LINE_TRACING,
-            speed,
-            senBL,
-            senBR,
-            senBC,
-            time
-        );
+        return this.sendAndAwaitZumi(
+                this.actionMode,
+                CommandType.COMMAND_LINE_TRACING,
+                speed,
+                senBL,
+                senBR,
+                senBC,
+                time
+            );
     }
 
     // 라인을 따라 지정된 거리만큼 주미가 이동하도록 명령
@@ -2050,7 +2239,8 @@ class Scratch3Esp32Bluetooth {
         if(dist < 0) dist = 0;
         if(dist > 255) dist = 255;
 
-        this.sendCommand(
+        return this.waitForSendLoopCheck(
+            this.actionMode,
             CommandType.COMMAND_LINE_TRACE_DIST,
             speed,
             dist,
@@ -2065,7 +2255,8 @@ class Scratch3Esp32Bluetooth {
         if(speed < 0) speed = 0;
         if(speed > 3) speed = 3;
 
-        this.sendCommand(
+        return this.waitForSendLoopCheck(
+            this.actionMode,
             CommandType.COMMAND_TRACE_INFINITE,
             speed,
         );
@@ -2073,10 +2264,13 @@ class Scratch3Esp32Bluetooth {
 
     move_stop(args)
     {
-        this.sendCommand(
+        // this.sendCommand(
+        //     CommandType.COMMAND_MOTION_STOP
+        // );
+        return this.sendAndAwaitZumi(
+            this.actionMode,
             CommandType.COMMAND_MOTION_STOP
         );
-
     }
 
     // ===============================================
@@ -2099,6 +2293,23 @@ class Scratch3Esp32Bluetooth {
 
         // 해당 속성이 없거나 유효하지 않은 경우 0을 반환합니다.
         return 0;
+    }
+
+
+    IRSensorReading_FL(args) {
+        return this.senFL;
+    }
+    IRSensorReading_FR(args) {
+        return this.senFR;
+    }
+    IRSensorReading_BL(args) {
+        return this.senBL;
+    }
+    IRSensorReading_BC(args) {
+        return this.senBC;
+    }
+    IRSensorReading_BR(args) {
+        return this.senBR;
     }
 
     /**
@@ -2200,12 +2411,20 @@ class Scratch3Esp32Bluetooth {
             if(args.STATE == 'on'){
                 this._current_request |= requestValue;
                // console.log(this._current_request);
-                this.sendCommand(CommandType.COMMAND_NONE)
+                // this.sendCommand(CommandType.COMMAND_NONE)
+                return this.waitForSendLoopCheck(
+                    this.actionMode,
+                    CommandType.COMMAND_NONE
+                );
             }
             else{
                 this._current_request &= ~requestValue;
                // console.log(this._current_request);
-                this.sendCommand(CommandType.COMMAND_NONE)
+              // this.sendCommand(CommandType.COMMAND_NONE)
+                return this.waitForSendLoopCheck(
+                    this.actionMode,
+                    CommandType.COMMAND_NONE
+                );
             }
         }
         else {
@@ -2832,6 +3051,7 @@ class Scratch3Esp32Bluetooth {
 
                     await this.transferData(dataToSend);
 
+                    this.checkedSendLoop = 0;
                 }
                 else if (this.motorTrigger == true){
                     // 모터가 작동중인 경우, 모터를 멈추지 않도록 보냄

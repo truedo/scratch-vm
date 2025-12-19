@@ -190,6 +190,31 @@ export const Form_getIRSensorReading = {
     'ko': '[SENSOR] IR 센서 값',
 };
 
+export const Form_IRSensorReading_FL = {
+    en: 'Front Left IR Sensor',
+    ko: '앞 왼쪽 IR 센서',
+};
+
+export const Form_IRSensorReading_FR = {
+    en: 'Front Right IR Sensor',
+    ko: '앞 오른쪽 IR 센서',
+};
+
+export const Form_IRSensorReading_BL = {
+    en: 'Bottom Left IR Sensor',
+    ko: '바닥 왼쪽 IR 센서',
+};
+
+export const Form_IRSensorReading_BC = {
+    en: 'Bottom Center IR Sensor',
+    ko: '바닥 가운데 IR 센서',
+};
+
+export const Form_IRSensorReading_BR = {
+    en: 'Bottom Right IR Sensor',
+    ko: '바닥 오른쪽 IR 센서',
+};
+
 export const Form_getBatReading = {
     'en': 'Get battery level',
     'ko': '배터리 잔량',
